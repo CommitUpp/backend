@@ -1,0 +1,96 @@
+name: Sheater-CI
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    # ==============================
+    # テスト
+    # ==============================
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Go
+              uses: actions/setup-go@v5
+              with:
+                go-version: '1.26.x'
+
+            - name: Run tests
+              run: go test ./...
+        
+    # ==============================
+    # ビルド & プッシュ
+    # ==============================
+    build:
+        runs-on: ubuntu-latest
+        needs: test
+        permissions:
+            contents: read
+            packages: write
+        strategy:
+          matrix:
+            service: [api, auth]        
+        outputs:
+            image_tag: ${{ steps.meta.outputs.version }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Login to ghcr.io
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Extract metadata
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/${{ github.repository }}
+                tags: |
+                  type=sha,prefix=${{ matrix.service }}-,format=short
+
+            - name: Build and push
+              uses: docker/build-push-action@v5
+              with:
+                context: ./${{ matrix.service }}
+                file: ./${{ matrix.service }}/Dockerfile
+                push: true
+                target: runner
+                tags: ${{ steps.meta.outputs.tags }}
+                cache-from: type=gha
+                cache-to: type=gha,mode=max
+    
+    # ==============================
+    # manifestsのタグ更新
+    # ==============================
+    update-manifests:
+        runs-on: ubuntu-latest
+        needs: build
+        steps: 
+            - name: Checkout manifests
+              uses: actions/checkout@v4
+              with:
+                repository: CommitUpp/k3s-manifests
+                token: ${{ secrets.MANIFESTS_TOKEN }}
+
+            - name: Update image tag
+              run: |
+                # APIディレクトリへ移動して実行
+                (cd apps/sheater/api/overlays/prod && kustomize edit set image ghcr.io/${{ github.repository }}=:${{ needs.build.outputs.image_tag }})
+                # Authディレクトリへ移動して実行
+                (cd apps/sheater/auth/overlays/prod && kustomize edit set image ghcr.io/${{ github.repository }}=:${{ needs.build.outputs.image_tag }})
+            
+            - name: Commit and push
+              run: |
+                git config user.name "github-actions"
+                git config user.email "actions@github.com"
+                git add .
+                git commit -m "ci: update api image tag to ${{ needs.build.outputs.image_tag }}"
+                git push 

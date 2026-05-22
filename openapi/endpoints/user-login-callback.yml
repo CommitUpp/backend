@@ -1,0 +1,82 @@
+callback:
+  post:
+    summary: Google認証後のコールバックAPI
+    operationId: loginCallback
+    security:
+      - SupabaseAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginCallbackRequest'
+    responses:
+      '200':
+        description: 認証成功
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCallbackResponse'
+      '400':
+        description: リクエスト不正（バリデーションエラーなど）
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BadRequestError'
+      '401':
+        description: 認証エラー
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnauthorizedError'
+      '500':
+        description: サーバー内部エラー
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalServerError'
+
+components:
+  securitySchemes:
+    SupabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginCallbackRequest:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1Ni..."
+
+    LoginCallbackResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+
+    BadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "invalid request body"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "invalid or expired token"
+
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "internal server error"

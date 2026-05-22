@@ -1,0 +1,6 @@
+# cfg.yaml
+package: http
+generate:
+  echo-server: true # Echo用のルーティング（RegisterHandlers）を生成
+  models: true      # 構造体（LoginCallbackRequestなど）を生成
+output: api/interfaces/http/api.gen.go
