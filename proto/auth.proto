@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "interfaces/grpc/pb;pb";
+
+service AuthService {
+  rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse);
+}
+
+message VerifyTokenRequest {
+  string access_token = 1;
+}
+
+message VerifyTokenResponse {
+  string user_id = 1;
+}

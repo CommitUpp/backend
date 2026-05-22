@@ -1,0 +1,30 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # ビルドコマンド: main.go をビルドして ./tmp/main に出力
+  cmd = "go build -o ./tmp/main ./cmd/main.go"
+  # 生成されたバイナリの実行場所
+  bin = "./tmp/main"
+  # 監視する拡張子
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  # 無視するディレクトリ
+  exclude_dir = ["assets", "tmp", "vendor", "frontend"]
+  # 変更検知の遅延（ミリ秒）
+  delay = 1000
+  # エラー時もログを出し続けるか
+  stop_on_error = true
+
+[log]
+  # ログに色をつけるか
+  time = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  # 終了時にtmpディレクトリを削除するか
+  clean_on_exit = true

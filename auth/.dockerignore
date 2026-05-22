@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Editor & OS (★超重要: キャッシュ崩れ防止)
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Go output & Dependencies
+# ローカルのビルド成果物やライブラリはコンテナに入れない
+bin/
+vendor/
+sheater-auth 
+
+# Air / Hot Reload
+tmp/
+.air.toml    
+
+# Env
+.env*
