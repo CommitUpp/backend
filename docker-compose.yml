@@ -22,6 +22,8 @@ services:
     depends_on:
       - auth
       - redis
+    networks:
+      - sheater-net
   
   # ========================================
   # Api Watcher (Realtimeログ監視担当)
@@ -46,6 +48,8 @@ services:
     depends_on:
       - auth
       - redis
+    networks:
+      - sheater-net
 
   # ========================================
   # Auth Service (gRPC / Redis門番)
@@ -69,6 +73,8 @@ services:
       - .env.auth
     depends_on:
       - redis
+    networks:
+      - sheater-net
 
   # ========================================
   # Cache DB
@@ -82,9 +88,14 @@ services:
       - redis_cache_data:/data
     # memory上限に達した際、古いキャッシュから自動削除
     command: redis-server --maxmemory-policy allkeys-lru
-
+    networks:
+      - sheater-net
     
 volumes:
   go_mod_cache:
   redis_cache_data:
     driver: local
+
+networks:
+  sheater-net:
+    driver: bridge
