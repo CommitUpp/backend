@@ -14,4 +14,5 @@ message VerifyTokenRequest {
 
 message VerifyTokenResponse {
   string user_id = 1;
+  string message = 2;
 }

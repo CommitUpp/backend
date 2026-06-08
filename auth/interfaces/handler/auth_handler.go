@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 
 	"github.com/CommitUpp/backend/auth/application/usecase"
 	"github.com/CommitUpp/backend/auth/interfaces/grpc/pb"
@@ -20,6 +21,18 @@ func NewAuthGRPCHandler(au usecase.AuthUsecase) pb.AuthServiceServer {
 	}
 }
 
-func (h *authGRPCHandler) VerifyToken(ctx context.Context, req *pb.VerifyTokenRequest) {
+func (h *authGRPCHandler) VerifyToken(ctx context.Context, req *pb.VerifyTokenRequest) (*pb.VerifyTokenResponse, error) {
+	userID, err := h.authUsecase.VerifyToken(ctx, req.GetAccessToken())
+	if err != nil {
+		if errors.Is(err, usecase.ErrUnauthorized) {
+			return nil, status.Error(codes.Unauthenticated, "invalid token")
+		}
 
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.VerifyTokenResponse{
+		UserId:  userID,
+		Message: "success",
+	}, nil
 }

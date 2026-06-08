@@ -20,14 +20,14 @@ func NewAuthHandler(au user.AuthUsecase) *AuthHandler {
 func (h *AuthHandler) LoginCallback(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	var req LoginCallbackRequest
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, BadRequestError{
-			Message: "invalid request body",
+	accessToken := bearerToken(c.Request().Header.Get("Authorization"))
+	if accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: "missing token",
 		})
 	}
 
-	_, err := h.authUsecase.LoginCallback(ctx, req.AccessToken)
+	_, err := h.authUsecase.LoginCallback(ctx, accessToken)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
 			Message: err.Error(),

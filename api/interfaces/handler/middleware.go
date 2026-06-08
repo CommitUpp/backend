@@ -2,36 +2,31 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 
+	"github.com/CommitUpp/backend/api/application/usecase/user"
 	"github.com/labstack/echo/v4"
-
-	"github.com/CommitUpp/backend/api/interfaces/grpc/pb"
 )
 
-func SupabaseAuthMiddleware(authClient pb.AuthServiceClient) echo.MiddlewareFunc {
+func SupabaseAuthMiddleware(authUsecase user.AuthUsecase) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			ctx := c.Request().Context()
 
-			authHeader := c.Request().Header.Get("Authorization")
-			token := strings.TrimPrefix(authHeader, "Bearer ")
-			if token == "" || authHeader == token {
+			token := bearerToken(c.Request().Header.Get("Authorization"))
+			if token == "" {
 				return c.JSON(http.StatusUnauthorized, UnauthorizedError{
 					Message: "missing token",
 				})
 			}
 
-			res, err := authClient.VerifyToken(ctx, &pb.VerifyTokenRequest{
-				AccessToken: token,
-			})
-			if err != nil || res.UserId == "" {
+			userID, err := authUsecase.VerifyToken(ctx, token)
+			if err != nil || userID == "" {
 				return c.JSON(http.StatusUnauthorized, UnauthorizedError{
 					Message: "invalid token",
 				})
 			}
 
-			c.Set("user_id", res.UserId)
+			c.Set("user_id", userID)
 			return next(c)
 		}
 	}
