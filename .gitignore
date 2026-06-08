@@ -41,7 +41,7 @@ auht/sheater-auth
 
 .task/
 
-api/interfaces/http/api.gen.go
+api/interfaces/handler/api.gen.go
 
 api/interfaces/grpc/pb/
 auth/interfaces/grpc/pb/

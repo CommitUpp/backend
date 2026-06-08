@@ -8,5 +8,52 @@ servers:
 
 paths:
   /user/callback:
-    $ref: './endpoints/user-login-callback.yml#/callback'
+    $ref: './user-login-callback.yml'
+  
+components:
+  securitySchemes:
+    SupabaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
+  schemas:
+    LoginCallbackRequest:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+
+    LoginCallbackResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+
+    BadRequestError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    UnauthorizedError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    InternalServerError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
