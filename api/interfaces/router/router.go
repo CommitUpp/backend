@@ -12,11 +12,7 @@ type RouterConfig struct {
 func NewRouter(cfg RouterConfig) *echo.Echo {
 	e := echo.New()
 
-	v1 := e.Group("/api/v1")
-
-	user := v1.Group("/user")
-
-	user.POST("/callback", cfg.AuthHandler.LoginCallback)
+	handler.RegisterHandlersWithBaseURL(e, cfg.AuthHandler, "/api/v1")
 
 	return e
 }

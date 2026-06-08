@@ -37,6 +37,6 @@ func main() {
 
 	e := router.NewRouter(routerConfig)
 
-	log.Printf("Goサーバーがポート %s で起動しました。")
+	log.Println("Goサーバーがポート 8080 で起動しました。")
 	log.Fatal(e.Start(":8080"))
 }
