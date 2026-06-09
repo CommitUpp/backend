@@ -7,25 +7,42 @@ import (
 	"time"
 
 	"github.com/CommitUpp/backend/auth/domain/repository"
-	"github.com/redis/go-redis/v9"
+	goredis "github.com/redis/go-redis/v9"
 )
 
 type tokenCacheRepositoryImpl struct {
-	client *redis.Client
+	client *goredis.Client
 }
 
-func NewTokenCacheRepository(client *redis.Client) repository.TokenCacheRepository {
+func NewTokenCacheRepository(client *goredis.Client) repository.TokenCacheRepository {
 	return &tokenCacheRepositoryImpl{
 		client: client,
 	}
 }
 
 func (r *tokenCacheRepositoryImpl) GetUserID(ctx context.Context, accessToken string) (string, error) {
-	return r.client.Get(ctx, cacheKey(accessToken)).Result()
+	startedAt := time.Now()
+
+	userID, err := r.client.Get(ctx, cacheKey(accessToken)).Result()
+	switch {
+	case err == nil && userID != "":
+		observeTokenCacheOperation("get", "hit", startedAt)
+	case err == goredis.Nil || (err == nil && userID == ""):
+		observeTokenCacheOperation("get", "miss", startedAt)
+	default:
+		observeTokenCacheOperation("get", "error", startedAt)
+	}
+
+	return userID, err
 }
 
 func (r *tokenCacheRepositoryImpl) SetUserID(ctx context.Context, accessToken string, userID string, ttl time.Duration) error {
-	return r.client.Set(ctx, cacheKey(accessToken), userID, ttl).Err()
+	startedAt := time.Now()
+
+	err := r.client.Set(ctx, cacheKey(accessToken), userID, ttl).Err()
+	observeTokenCacheOperation("set", redisSetResult(err), startedAt)
+
+	return err
 }
 
 func cacheKey(accessToken string) string {

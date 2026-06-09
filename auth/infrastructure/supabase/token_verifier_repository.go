@@ -32,8 +32,11 @@ func NewTokenVerifierRepository(baseURL string, apiKey string) repository.TokenV
 }
 
 func (r *tokenVerifierRepositoryImpl) Verify(ctx context.Context, accessToken string) (*repository.VerifiedToken, error) {
+	startedAt := time.Now()
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/auth/v1/user", nil)
 	if err != nil {
+		observeTokenVerify("error", 0, startedAt)
 		return nil, err
 	}
 
@@ -44,11 +47,13 @@ func (r *tokenVerifierRepositoryImpl) Verify(ctx context.Context, accessToken st
 
 	res, err := r.client.Do(req)
 	if err != nil {
+		observeTokenVerify("error", 0, startedAt)
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
+		observeTokenVerify("invalid", res.StatusCode, startedAt)
 		return nil, ErrInvalidToken
 	}
 
@@ -56,16 +61,21 @@ func (r *tokenVerifierRepositoryImpl) Verify(ctx context.Context, accessToken st
 		ID string `json:"id"`
 	}
 	if err := json.NewDecoder(res.Body).Decode(&user); err != nil {
+		observeTokenVerify("error", res.StatusCode, startedAt)
 		return nil, err
 	}
 	if user.ID == "" {
+		observeTokenVerify("invalid", res.StatusCode, startedAt)
 		return nil, ErrInvalidToken
 	}
 
 	ttl, err := tokenTTL(accessToken, time.Now())
 	if err != nil {
+		observeTokenVerify("invalid", res.StatusCode, startedAt)
 		return nil, err
 	}
+
+	observeTokenVerify("success", res.StatusCode, startedAt)
 
 	return &repository.VerifiedToken{
 		UserID: user.ID,

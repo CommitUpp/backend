@@ -67,6 +67,7 @@ services:
       - /app/tmp
     ports: 
       - "50051:50051"
+      - "25000:25000"
     tty: true
     stdin_open: true
     env_file:
