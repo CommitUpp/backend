@@ -10,6 +10,8 @@ import (
 	"github.com/CommitUpp/backend/api/interfaces/handler"
 	"github.com/CommitUpp/backend/api/interfaces/router"
 
+	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	ggrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -36,6 +38,10 @@ func main() {
 	}
 
 	e := router.NewRouter(routerConfig)
+
+	e.Use(handler.MetricsMiddleware())
+	// Exposes API HTTP request count, latency, and in-flight request metrics for Prometheus.
+	e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	log.Println("Goサーバーがポート 8080 で起動しました。")
 	log.Fatal(e.Start(":8080"))

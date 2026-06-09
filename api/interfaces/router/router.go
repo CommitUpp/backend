@@ -12,6 +12,7 @@ type RouterConfig struct {
 func NewRouter(cfg RouterConfig) *echo.Echo {
 	e := echo.New()
 
+	e.Use(handler.CORSMiddleware())
 	handler.RegisterHandlersWithBaseURL(e, cfg.AuthHandler, "/api/v1")
 
 	return e
