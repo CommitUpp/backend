@@ -40,3 +40,26 @@ func (h *AuthHandler) LoginCallback(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, res)
 }
+
+func (h *AuthHandler) Logout(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	accessToken := bearerToken(c.Request().Header.Get("Authorization"))
+	if accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: "missing token",
+		})
+	}
+
+	if err := h.authUsecase.Logout(ctx, accessToken); err != nil {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: err.Error(),
+		})
+	}
+
+	res := LogoutResponse{
+		Status: "success",
+	}
+
+	return c.JSON(http.StatusOK, res)
+}

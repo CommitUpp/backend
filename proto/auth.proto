@@ -6,6 +6,7 @@ option go_package = "interfaces/grpc/pb;pb";
 
 service AuthService {
   rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenResponse);
+  rpc Logout (LogoutRequest) returns (LogoutResponse);
 }
 
 message VerifyTokenRequest {
@@ -15,4 +16,12 @@ message VerifyTokenRequest {
 message VerifyTokenResponse {
   string user_id = 1;
   string message = 2;
+}
+
+message LogoutRequest {
+  string access_token = 1;
+}
+
+message LogoutResponse {
+  string message = 1;
 }

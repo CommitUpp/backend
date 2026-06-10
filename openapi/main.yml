@@ -9,7 +9,9 @@ servers:
 paths:
   /user/callback:
     $ref: './user-login-callback.yml'
-  
+  /user/logout:
+    $ref: './user-logout.yml'
+
 components:
   securitySchemes:
     SupabaseAuth:
@@ -19,6 +21,14 @@ components:
 
   schemas:
     LoginCallbackResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+
+    LogoutResponse:
       type: object
       required:
         - status

@@ -36,3 +36,17 @@ func (h *authGRPCHandler) VerifyToken(ctx context.Context, req *pb.VerifyTokenRe
 		Message: "success",
 	}, nil
 }
+
+func (h *authGRPCHandler) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
+	if err := h.authUsecase.Logout(ctx, req.GetAccessToken()); err != nil {
+		if errors.Is(err, usecase.ErrUnauthorized) {
+			return nil, status.Error(codes.Unauthenticated, "missing token")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &pb.LogoutResponse{
+		Message: "success",
+	}, nil
+}

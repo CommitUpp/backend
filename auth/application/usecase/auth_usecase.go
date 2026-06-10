@@ -12,6 +12,7 @@ var ErrUnauthorized = errors.New("unauthorized")
 
 type AuthUsecase interface {
 	VerifyToken(ctx context.Context, accessToken string) (string, error)
+	Logout(ctx context.Context, accessToken string) error
 }
 
 type authUsecaseImpl struct {
@@ -50,4 +51,12 @@ func (u *authUsecaseImpl) VerifyToken(ctx context.Context, accessToken string) (
 	}
 
 	return verifiedToken.UserID, nil
+}
+
+func (u *authUsecaseImpl) Logout(ctx context.Context, accessToken string) error {
+	if accessToken == "" {
+		return ErrUnauthorized
+	}
+
+	return u.tokenCache.DeleteUserID(ctx, accessToken)
 }
