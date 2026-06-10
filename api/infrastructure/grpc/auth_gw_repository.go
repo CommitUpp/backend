@@ -34,3 +34,12 @@ func (g *authGatewayImpl) VerifyToken(ctx context.Context, accessToken string) (
 
 	return res.GetUserId(), nil
 }
+
+func (g *authGatewayImpl) Logout(ctx context.Context, accessToken string) error {
+	req := &pb.LogoutRequest{
+		AccessToken: accessToken,
+	}
+
+	_, err := g.client.Logout(ctx, req)
+	return err
+}

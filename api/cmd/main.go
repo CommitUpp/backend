@@ -10,6 +10,8 @@ import (
 	"github.com/CommitUpp/backend/api/interfaces/handler"
 	"github.com/CommitUpp/backend/api/interfaces/router"
 
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	ggrpc "google.golang.org/grpc"
@@ -38,6 +40,12 @@ func main() {
 	}
 
 	e := router.NewRouter(routerConfig)
+
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"status": "success",
+		})
+	})
 
 	e.Use(handler.MetricsMiddleware())
 	// Exposes API HTTP request count, latency, and in-flight request metrics for Prometheus.

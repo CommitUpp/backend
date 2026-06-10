@@ -6,6 +6,8 @@ tasks:
     sources:
       - openapi/cfg.yml
       - openapi/main.yml
+      - openapi/user-login-callback.yml
+      - openapi/user-logout.yml
       - proto/auth.proto
     generates:
       # OpenAPIの出力先

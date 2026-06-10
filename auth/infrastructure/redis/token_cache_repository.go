@@ -45,6 +45,15 @@ func (r *tokenCacheRepositoryImpl) SetUserID(ctx context.Context, accessToken st
 	return err
 }
 
+func (r *tokenCacheRepositoryImpl) DeleteUserID(ctx context.Context, accessToken string) error {
+	startedAt := time.Now()
+
+	err := r.client.Del(ctx, cacheKey(accessToken)).Err()
+	observeTokenCacheOperation("delete", redisSetResult(err), startedAt)
+
+	return err
+}
+
 func cacheKey(accessToken string) string {
 	hash := sha256.Sum256([]byte(accessToken))
 	return "auth:access_token:" + hex.EncodeToString(hash[:])
