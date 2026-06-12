@@ -2,15 +2,17 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
+	"strings"
 
+	"github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
+	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
 	"github.com/CommitUpp/backend/api/interfaces/grpc/pb"
 	"github.com/CommitUpp/backend/api/interfaces/handler"
 	"github.com/CommitUpp/backend/api/interfaces/router"
-
-	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -35,8 +37,24 @@ func main() {
 	authUsecase := user.NewAuthUsecase(authGateway)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
+	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
+	if supabaseURL == "" {
+		log.Fatal("PUBLIC_SUPABASE_URL is required")
+	}
+
+	supabaseAnonKey := os.Getenv("SUPABASE_ANON_KEY")
+	if supabaseAnonKey == "" {
+		log.Fatal("SUPABASE_ANON_KEY is required")
+	}
+
+	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL+"/rest/v1", supabaseAnonKey)
+	movieStatusUsecase := movie.NewMovieStatusUsecase(movieStatusRepository)
+	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
+
 	routerConfig := router.RouterConfig{
-		AuthHandler: authHandler,
+		AuthHandler:        authHandler,
+		MovieStatusHandler: movieStatusHandler,
+		AuthUsecase:        authUsecase,
 	}
 
 	e := router.NewRouter(routerConfig)
