@@ -11,6 +11,8 @@ paths:
     $ref: './user-login-callback.yml'
   /user/logout:
     $ref: './user-logout.yml'
+  /movie/status:
+    $ref: './movie-status.yml'
 
 components:
   securitySchemes:
@@ -35,6 +37,28 @@ components:
       properties:
         status:
           type: string
+
+    UpdateMovieStatusRequest:
+      type: object
+      required:
+        - movie_id
+        - status
+      properties:
+        movie_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [watched, wanna_watch]
+
+    UpdateMovieStatusResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: success
 
     BadRequestError:
       type: object

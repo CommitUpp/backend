@@ -8,6 +8,7 @@ tasks:
       - openapi/main.yml
       - openapi/user-login-callback.yml
       - openapi/user-logout.yml
+      - openapi/movie-status.yml
       - proto/auth.proto
     generates:
       # OpenAPIの出力先
