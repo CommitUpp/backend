@@ -109,7 +109,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/commitupp/backend
           tags: |
             type=sha,prefix=${{ matrix.service }}-,format=short
 
@@ -142,16 +142,17 @@ jobs:
 
       - name: Update image tags
         run: |
+          IMAGE="ghcr.io/commitupp/backend"
           API_TAG="api-${GITHUB_SHA::7}"
           AUTH_TAG="auth-${GITHUB_SHA::7}"
 
           (cd apps/sheater/api/overlays/prod && \
             kustomize edit set image \
-            ghcr.io/${{ github.repository }}=ghcr.io/${{ github.repository }}:"${API_TAG}")
+            "${IMAGE}=${IMAGE}:${API_TAG}")
 
           (cd apps/sheater/auth/overlays/prod && \
             kustomize edit set image \
-            ghcr.io/${{ github.repository }}=ghcr.io/${{ github.repository }}:"${AUTH_TAG}")
+            "${IMAGE}=${IMAGE}:${AUTH_TAG}")
 
       - name: Commit and push
         run: |
