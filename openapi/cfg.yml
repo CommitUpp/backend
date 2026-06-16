@@ -1,0 +1,8 @@
+# cfg.yaml
+package: handler
+generate:
+  - echo-server 
+  - models      
+  - types
+output: api/interfaces/handler/api.gen.go
+

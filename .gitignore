@@ -25,8 +25,23 @@ go.work
 go.work.sum
 
 # env file
-.env
-
+.env*
+*.env
 # Editor/IDE
-# .idea/
-# .vscode/
+.DS_Store
+.idea/
+.vscode/
+
+api/tmp/
+auth/tmp/
+api/main
+autj/main
+api/sheater-api
+auht/sheater-auth
+
+.task/
+
+api/interfaces/handler/api.gen.go
+
+api/interfaces/grpc/pb/
+auth/interfaces/grpc/pb/

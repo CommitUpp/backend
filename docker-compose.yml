@@ -1,0 +1,102 @@
+services:
+  # ========================================
+  # Api Service (REST API)
+  # ========================================
+  api:
+    platform: linux/amd64
+    container_name: backend-api
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+      target: develop
+    volumes:
+      - ./api:/app
+      - go_mod_cache:/go/pkg/mod
+      - /app/tmp
+    ports:
+      - "8080:8080"
+    tty: true
+    stdin_open: true
+    env_file:
+      - .env.api
+    depends_on:
+      - auth
+      - redis
+    networks:
+      - sheater-net
+  
+  # ========================================
+  # Api Watcher (Realtimeログ監視担当)
+  # ========================================
+  api-watcher:
+    platform: linux/amd64
+    container_name: backend-api-watcher
+    build: 
+      context: ./api  
+      dockerfile: Dockerfile
+      target: develop
+    volumes:
+      - ./api:/app
+      - go_mod_cache:/go/pkg/mod
+      - /app/tmp
+    ports:
+      - "10100:8080"
+    tty: true
+    stdin_open: true
+    env_file:
+      - .env.api-watcher
+    depends_on:
+      - auth
+      - redis
+    networks:
+      - sheater-net
+
+  # ========================================
+  # Auth Service (gRPC / Redis門番)
+  # ========================================
+  auth:
+    platform: linux/amd64
+    container_name: backend-auth
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+      target: develop
+    volumes:
+      - ./auth:/app
+      - go_mod_cache:/go/pkg/mod
+      - /app/tmp
+    ports: 
+      - "50051:50051"
+      - "25000:25000"
+    tty: true
+    stdin_open: true
+    env_file:
+      - .env.auth
+    depends_on:
+      - redis
+    networks:
+      - sheater-net
+
+  # ========================================
+  # Cache DB
+  # ========================================
+  redis:
+    image: redis:8.0-alpine
+    container_name: redis-cache
+    ports: 
+      - "6379:6379"
+    volumes:
+      - redis_cache_data:/data
+    # memory上限に達した際、古いキャッシュから自動削除
+    command: redis-server --maxmemory-policy allkeys-lru
+    networks:
+      - sheater-net
+    
+volumes:
+  go_mod_cache:
+  redis_cache_data:
+    driver: local
+
+networks:
+  sheater-net:
+    driver: bridge

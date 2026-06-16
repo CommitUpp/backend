@@ -1,0 +1,24 @@
+post:
+  summary: ログアウトAPI
+  operationId: logout
+  security:
+    - SupabaseAuth: []
+  responses:
+    '200':
+      description: ログアウト成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LogoutResponse'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'

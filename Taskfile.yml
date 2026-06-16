@@ -1,0 +1,68 @@
+version: '3'
+
+tasks:
+  gen:
+    desc: "OpenAPI と Protocol Buffers(gRPC) からコードを自動生成する"
+    sources:
+      - openapi/cfg.yml
+      - openapi/main.yml
+      - openapi/user-login-callback.yml
+      - openapi/user-logout.yml
+      - openapi/movie-status.yml
+      - proto/auth.proto
+    generates:
+      # OpenAPIの出力先
+      - api/interfaces/http/api.gen.go
+      # gRPCの出力先
+      - auth/interfaces/grpc/pb/*.pb.go
+      - api/interfaces/grpc/pb/*.pb.go
+    cmds:
+      - oapi-codegen -config openapi/cfg.yml openapi/main.yml
+      - protoc --go_out=auth --go-grpc_out=auth proto/auth.proto
+      - protoc --proto_path=proto --go_out=api --go-grpc_out=api proto/auth.proto
+
+  dup:
+    desc: "🚀 開発環境の起動（バックグラウンドでビルド＆Air常駐）"
+    cmds:
+      - docker compose up -d --build
+
+  bup:
+    desc: "🚀 開発環境の起動（フォアグラウンドでビルド＆Air常駐）"
+    cmds:
+      - docker compose up --build
+
+  down:
+    desc: "🛑 開発環境の停止"
+    cmds:
+      - docker compose down
+
+  downv:
+    desc: "🛑 開発環境の停止（ボリュームも削除）"
+    cmds:
+      - docker compose down -v
+
+  restart:
+    desc: "🔄 コンテナの再起動（設定ファイルを書き換えた時など）"
+    cmds:
+      - docker compose restart
+
+  logsi:
+    desc: "📊 apiコンテナのログをリアルタイムで監視"
+    cmds:
+      - docker compose logs -f api
+
+  logsh:
+    desc: "📊 authコンテナのログをリアルタイムで監視"
+    cmds:
+      - docker compose logs -f auth
+
+  ps:
+    desc: "🔍 コンテナの稼働状態を確認"
+    cmds:
+      - docker compose ps
+
+  clean:
+    desc: "🧹 完全に真っ新な状態から再ビルドしたい時の大掃除"
+    cmds:
+      - docker compose down --volumes --remove-orphans
+      - docker builder prune -f
