@@ -9,7 +9,7 @@ import (
 type RouterConfig struct {
 	AuthHandler        *handler.AuthHandler
 	MovieStatusHandler *handler.MovieStatusHandler
-	AuthUsecase user.AuthUsecase
+	AuthUsecase        user.AuthUsecase
 }
 
 func NewRouter(cfg RouterConfig) *echo.Echo {
@@ -17,11 +17,17 @@ func NewRouter(cfg RouterConfig) *echo.Echo {
 
 	e.Use(handler.CORSMiddleware())
 
-	e.Use(handler.SupabaseAuthMiddleware(cfg.AuthUsecase))
-
 	apiServer := handler.NewServer(cfg.AuthHandler, cfg.MovieStatusHandler)
 
-	handler.RegisterHandlersWithBaseURL(e, apiServer, "/api/v1")
+	authMiddleware := handler.SupabaseAuthMiddleware(cfg.AuthUsecase)
+	handler.RegisterHandlersWithOptions(e, apiServer, handler.RegisterHandlersOptions{
+		BaseURL: "/api/v1",
+		OperationMiddlewares: map[string][]echo.MiddlewareFunc{
+			"loginCallback":     {authMiddleware},
+			"logout":            {authMiddleware},
+			"updateMovieStatus": {authMiddleware},
+		},
+	})
 
 	return e
 }
