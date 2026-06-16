@@ -81,6 +81,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      actions: write
     strategy:
       matrix:
         service: [api, auth]
