@@ -6,20 +6,21 @@ tasks:
     sources:
       - openapi/cfg.yml
       - openapi/main.yml
+      - openapi/group-create.yml
       - openapi/user-login-callback.yml
       - openapi/user-logout.yml
       - openapi/movie-status.yml
       - proto/auth.proto
     generates:
       # OpenAPIの出力先
-      - api/interfaces/http/api.gen.go
+      - api/interfaces/handler/api.gen.go
       # gRPCの出力先
       - auth/interfaces/grpc/pb/*.pb.go
       - api/interfaces/grpc/pb/*.pb.go
     cmds:
-      - oapi-codegen -config openapi/cfg.yml openapi/main.yml
-      - protoc --go_out=auth --go-grpc_out=auth proto/auth.proto
-      - protoc --proto_path=proto --go_out=api --go-grpc_out=api proto/auth.proto
+      - $(go env GOPATH)/bin/oapi-codegen -config openapi/cfg.yml openapi/main.yml
+      - PATH="$(go env GOPATH)/bin:$PATH" protoc --go_out=auth --go-grpc_out=auth proto/auth.proto
+      - PATH="$(go env GOPATH)/bin:$PATH" protoc --proto_path=proto --go_out=api --go-grpc_out=api proto/auth.proto
 
   dup:
     desc: "🚀 開発環境の起動（バックグラウンドでビルド＆Air常駐）"
@@ -66,3 +67,41 @@ tasks:
     cmds:
       - docker compose down --volumes --remove-orphans
       - docker builder prune -f
+  
+  dep:
+    desc: "📦 依存関係のインストール（Go Modules）"
+    cmds:
+      - task: dep:api
+      - task: dep:auth
+
+  dep:api:
+    desc: "📦 api の依存関係を整理する"
+    dir: api
+    cmds:
+      - mkdir -p tmp
+      - task: dep:api:tmp-module
+      - go mod tidy
+
+  dep:api:tmp-module:
+    desc: "📦 api/tmp を Go の探索対象から外す"
+    dir: api/tmp
+    status:
+      - test -f go.mod
+    cmds:
+      - go mod init github.com/CommitUpp/backend/api/tmp
+
+  dep:auth:
+    desc: "📦 auth の依存関係を整理する"
+    dir: auth
+    cmds:
+      - mkdir -p tmp
+      - task: dep:auth:tmp-module
+      - go mod tidy
+
+  dep:auth:tmp-module:
+    desc: "📦 auth/tmp を Go の探索対象から外す"
+    dir: auth/tmp
+    status:
+      - test -f go.mod
+    cmds:
+      - go mod init github.com/CommitUpp/backend/auth/tmp

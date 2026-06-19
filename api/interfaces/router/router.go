@@ -7,9 +7,8 @@ import (
 )
 
 type RouterConfig struct {
-	AuthHandler        *handler.AuthHandler
-	MovieStatusHandler *handler.MovieStatusHandler
-	AuthUsecase        user.AuthUsecase
+	AuthUsecase user.AuthUsecase
+	Server      *handler.Server
 }
 
 func NewRouter(cfg RouterConfig) *echo.Echo {
@@ -17,15 +16,14 @@ func NewRouter(cfg RouterConfig) *echo.Echo {
 
 	e.Use(handler.CORSMiddleware())
 
-	apiServer := handler.NewServer(cfg.AuthHandler, cfg.MovieStatusHandler)
-
 	authMiddleware := handler.SupabaseAuthMiddleware(cfg.AuthUsecase)
-	handler.RegisterHandlersWithOptions(e, apiServer, handler.RegisterHandlersOptions{
+	handler.RegisterHandlersWithOptions(e, cfg.Server, handler.RegisterHandlersOptions{
 		BaseURL: "/api/v1",
 		OperationMiddlewares: map[string][]echo.MiddlewareFunc{
-			"loginCallback":     {authMiddleware},
-			"logout":            {authMiddleware},
-			"updateMovieStatus": {authMiddleware},
+			"loginCallback": {authMiddleware},
+			"logout":        {authMiddleware},
+			"watchStatus":   {authMiddleware},
+			"createGroup":   {authMiddleware},
 		},
 	})
 

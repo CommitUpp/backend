@@ -1,6 +1,6 @@
 post:
-  summary: 映画の視聴ステータスを更新するAPI
-  operationId: watchStatus
+  summary: グループ作成API
+  operationId: createGroup
   security:
     - SupabaseAuth: []
   requestBody:
@@ -8,16 +8,16 @@ post:
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/UpdateMovieStatusRequest'
+          $ref: '#/components/schemas/CreateGroupRequest'
   responses:
-    '200':
-      description: ステータス更新成功
+    '201':
+      description: グループ作成成功
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UpdateMovieStatusResponse'
+            $ref: '#/components/schemas/CreateGroupResponse'
     '400':
-      description: バリデーションエラー
+      description: リクエスト不正（バリデーションエラーなど）
       content:
         application/json:
           schema:
