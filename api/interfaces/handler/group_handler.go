@@ -5,20 +5,17 @@ import (
 	"net/http"
 
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
-	"github.com/CommitUpp/backend/api/application/usecase/user"
 	"github.com/labstack/echo/v4"
 )
 
 // グループ関連APIのHTTPリクエストを受け取るハンドラー
 type GroupHandler struct {
-	authUsecase  user.AuthUsecase
 	groupUsecase groupusecase.GroupUsecase
 }
 
 // グループ関連エンドポイントのハンドラーを生成
-func NewGroupHandler(au user.AuthUsecase, gu groupusecase.GroupUsecase) *GroupHandler {
+func NewGroupHandler(gu groupusecase.GroupUsecase) *GroupHandler {
 	return &GroupHandler{
-		authUsecase:  au,
 		groupUsecase: gu,
 	}
 }
@@ -27,18 +24,10 @@ func NewGroupHandler(au user.AuthUsecase, gu groupusecase.GroupUsecase) *GroupHa
 func (h *GroupHandler) CreateGroup(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	accessToken := bearerToken(c.Request().Header.Get("Authorization"))
-	if accessToken == "" {
+	userID, ok := c.Get("user_id").(string)
+	if !ok || userID == "" {
 		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
-			Message: "missing token",
-		})
-	}
-
-	// Bearer tokenから認証済みユーザーIDを取得し、作成者としてusecaseへ渡します。
-	userID, err := h.authUsecase.VerifyToken(ctx, accessToken)
-	if err != nil || userID == "" {
-		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
-			Message: "invalid token",
+			Message: "invalid user",
 		})
 	}
 

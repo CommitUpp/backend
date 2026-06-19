@@ -65,7 +65,7 @@ func main() {
 	groupRepository := postgres.NewGroupRepository(dbPool)
 	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
 	authHandler := handler.NewAuthHandler(authUsecase)
-	groupHandler := handler.NewGroupHandler(authUsecase, groupUsecase)
+	groupHandler := handler.NewGroupHandler(groupUsecase)
 
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
