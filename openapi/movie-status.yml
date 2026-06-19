@@ -6,7 +6,7 @@ get:
   parameters:
     - name: status
       in: query
-      required: true
+      required: false
       schema:
         type: string
         enum: [watched, wanna_watch]
