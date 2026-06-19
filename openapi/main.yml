@@ -7,6 +7,8 @@ servers:
   - url: /api/v1
 
 paths:
+  /groups:
+    $ref: './group-create.yml'
   /user/callback:
     $ref: './user-login-callback.yml'
   /user/logout:
@@ -22,6 +24,44 @@ components:
       bearerFormat: JWT
 
   schemas:
+    CreateGroupRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+
+    CreateGroupResponse:
+      type: object
+      required:
+        - group
+      properties:
+        group:
+          $ref: '#/components/schemas/Group'
+
+    Group:
+      type: object
+      required:
+        - id
+        - name
+        - monthlyGoal
+        - createdAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        monthlyGoal:
+          type: integer
+          format: int32
+          minimum: 0
+        createdAt:
+          type: string
+          format: date-time
+
     LoginCallbackResponse:
       type: object
       required:

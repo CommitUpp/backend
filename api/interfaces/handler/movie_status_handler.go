@@ -18,7 +18,7 @@ func NewMovieStatusHandler(u movie.MovieStatusUsecase) *MovieStatusHandler {
 	}
 }
 
-func (h *MovieStatusHandler) UpdateMovieStatus(c echo.Context) error {
+func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	//	リクエストボディのバインド

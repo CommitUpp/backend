@@ -2,10 +2,6 @@ package infrastructure
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
-	"errors"
-	"log"
 	"strings"
 
 	"github.com/CommitUpp/backend/api/domain/repository"
@@ -19,19 +15,12 @@ type MovieStatusRepository struct {
 
 func NewMovieStatusRepository(baseURL string, apiKey string) repository.MovieStatusRepository {
 	return &MovieStatusRepository{
-		baseURL: baseURL,
+		baseURL: strings.TrimRight(baseURL, "/") + "/rest/v1",
 		apiKey:  apiKey,
 	}
 }
 
-func (r *MovieStatusRepository) UpsertWatchStatus(ctx context.Context, movieID string, userID string, status string, accessToken string) error {
-	claims, claimsErr := jwtClaims(accessToken)
-	if claimsErr != nil {
-		log.Printf("failed to decode access token claims for watch status upsert: err=%v", claimsErr)
-	} else {
-		log.Printf("watch status upsert auth claims: sub=%s role=%s matches_user_id=%t", claims.Sub, claims.Role, claims.Sub == userID)
-	}
-
+func (r *MovieStatusRepository) WatchStatus(ctx context.Context, movieID string, userID string, status string, accessToken string) error {
 	// データを作成
 	row := map[string]interface{}{
 		"user_id":  userID,
@@ -62,28 +51,4 @@ func (r *MovieStatusRepository) UpsertWatchStatus(ctx context.Context, movieID s
 	}
 
 	return nil
-}
-
-type accessTokenClaims struct {
-	Sub  string `json:"sub"`
-	Role string `json:"role"`
-}
-
-func jwtClaims(accessToken string) (*accessTokenClaims, error) {
-	parts := strings.Split(accessToken, ".")
-	if len(parts) != 3 {
-		return nil, errors.New("invalid jwt format")
-	}
-
-	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
-	if err != nil {
-		return nil, err
-	}
-
-	var claims accessTokenClaims
-	if err := json.Unmarshal(payload, &claims); err != nil {
-		return nil, err
-	}
-
-	return &claims, nil
 }

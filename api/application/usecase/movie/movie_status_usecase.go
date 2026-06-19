@@ -27,7 +27,7 @@ func (u *movieStatusUsecase) Execute(ctx context.Context, movieID string, userID
 		return errors.New("invalid status value")
 	}
 
-	err := u.movieStatusRepo.UpsertWatchStatus(ctx, movieID, userID, status, accessToken)
+	err := u.movieStatusRepo.WatchStatus(ctx, movieID, userID, status, accessToken)
 	if err != nil {
 		return err
 	}
