@@ -1,3 +1,41 @@
+get:
+  summary: 視聴ステータスごとの映画一覧を取得するAPI
+  operationId: getMovieStatus
+  security:
+    - SupabaseAuth: []
+  parameters:
+    - name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [watched, wanna_watch]
+  responses:
+    '200':
+      description: 映画一覧取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetMovieStatusResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+
 post:
   summary: 映画の視聴ステータスを更新するAPI
   operationId: watchStatus

@@ -100,6 +100,46 @@ components:
           type: string
           example: success
 
+    GetMovieStatus:
+      type: object
+      required:
+        - movie_id
+        - tmdb_id
+        - title
+        - poster_url
+        - trailer_url
+        - overview
+        - release_date
+        - updated_at
+      properties:
+        movie_id:
+          type: string
+        tmdb_id:
+          type: string
+        title:
+          type: string
+        poster_url:
+          type: string
+        trailer_url:
+          type: string
+        overview:
+          type: string
+        release_date:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+
+    GetMovieStatusResponse:
+      type: object
+      required:
+        - movies
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetMovieStatus'
+
     BadRequestError:
       type: object
       required:

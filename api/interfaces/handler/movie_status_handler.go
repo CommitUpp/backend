@@ -61,3 +61,56 @@ func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, UpdateMovieStatusResponse{Status: "success"})
 }
+
+func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatusParams) error {
+	ctx := c.Request().Context()
+
+	var status *string
+	if params.Status != nil {
+		s := string(*params.Status)
+		status = &s
+	}
+
+	userID := c.Get("user_id")
+	if userID == nil {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
+	}
+
+	userIDStr, ok := userID.(string)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "ユーザーIDの解析に失敗しました"})
+	}
+
+	accessToken, ok := c.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
+	}
+
+	movieStatuses, err := h.movieStatusUsecase.GetStatuses(ctx, userIDStr, status, accessToken)
+	if err != nil {
+		if err.Error() == "invalid status filter value" {
+			return c.JSON(http.StatusBadRequest, BadRequestError{Message: err.Error()})
+		}
+		if err.Error() == "user ID is required" || err.Error() == "access token is required" {
+			return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
+		}
+		log.Printf("failed to get movie statuses: user_id=%s status=%s err=%v", userIDStr, status, err)
+		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "映画一覧の取得に失敗しました"})
+	}
+
+	movies := make([]GetMovieStatus, 0, len(movieStatuses))
+	for _, movieStatus := range movieStatuses {
+		movies = append(movies, GetMovieStatus{
+			MovieId:     movieStatus.MovieID,
+			TmdbId:      movieStatus.TMDBID,
+			Title:       movieStatus.Title,
+			PosterUrl:   movieStatus.PosterURL,
+			TrailerUrl:  movieStatus.TrailerURL,
+			Overview:    movieStatus.Overview,
+			ReleaseDate: movieStatus.ReleaseDate,
+			UpdatedAt:   movieStatus.UpdatedAt,
+		})
+	}
+
+	return c.JSON(http.StatusOK, GetMovieStatusResponse{Movies: movies})
+}
