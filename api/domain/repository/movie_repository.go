@@ -9,8 +9,8 @@ type MovieRepository interface {
 }
 
 type Movie struct {
-	MovieID     string
-	TMDBID      string
-	Title       string
-	PosterURL   string
+	MovieID   string
+	TMDBID    string
+	Title     string
+	PosterURL string
 }
