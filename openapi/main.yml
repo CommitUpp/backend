@@ -15,6 +15,8 @@ paths:
     $ref: './user-logout.yml'
   /movie/status:
     $ref: './movie-status.yml'
+  /groups/{group_id}/movie-statuses:
+    $ref: './group-movie-statuses.yml'
 
 components:
   securitySchemes:
@@ -40,7 +42,7 @@ components:
         - group
       properties:
         group:
-          $ref: '#/components/schemas/Group'
+          $ref: "#/components/schemas/Group"
 
     Group:
       type: object
@@ -138,7 +140,50 @@ components:
         movies:
           type: array
           items:
-            $ref: '#/components/schemas/GetMovieStatus'
+            $ref: "#/components/schemas/GetMovieStatus"
+
+    GetGroupMovieStatusesResponse:
+      type: object
+      required:
+        - group_id
+        - movies
+      properties:
+        group_id:
+          type: string
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetGroupMovieStatusesMovie"
+
+    GetGroupMovieStatusesMovie:
+      type: object
+      required:
+        - movie_id
+        - title
+        - poster_url
+        - watched_member
+      properties:
+        movie_id:
+          type: string
+        title:
+          type: string
+        poster_url:
+          type: string
+        watched_member:
+          type: array
+          items:
+            $ref: "#/components/schemas/WatchedMember"
+
+    WatchedMember:
+      type: object
+      required:
+        - user_id
+        - avatar_url
+      properties:
+        user_id:
+          type: string
+        avatar_url:
+          type: string
 
     BadRequestError:
       type: object
