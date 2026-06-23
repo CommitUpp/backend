@@ -74,6 +74,7 @@ func main() {
 		log.Fatal("SUPABASE_ANON_KEY is required")
 	}
 
+	// repository
 	groupRepository := infrastructure.NewGroupRepository(supabaseURL, supabaseAnonKey)
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
 	movieRepository := postgres.NewMovieRepository(dbPool)
