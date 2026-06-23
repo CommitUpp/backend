@@ -32,4 +32,5 @@ type CreatedGroup struct {
 
 type GroupRepository interface {
 	CreateGroupWithOwner(ctx context.Context, input CreateGroupWithOwnerInput) (CreatedGroup, error)
+	IsGroupMember(ctx context.Context, userID string, groupID string) (bool, error)
 }

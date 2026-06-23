@@ -1,6 +1,6 @@
 get:
   summary: グループ内の視聴状況を取得するAPI
-  operationId: getGroupMovieStatuses
+  operationId: getGroupWatchedMovies
   security:
     - SupabaseAuth: []
   parameters:
@@ -15,7 +15,13 @@ get:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetGroupMovieStatusesResponse'
+            $ref: '#/components/schemas/GetGroupWatchedMoviesResponse'
+    '403':
+      description: 権限エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
     '400':
       description: バリデーションエラー
       content:
