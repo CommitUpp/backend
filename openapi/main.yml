@@ -138,6 +138,10 @@ components:
           type: string
         release_date:
           type: string
+        streaming_services:
+          type: array
+          items:
+            type: string
         watched_user:
           type: array
           items:
