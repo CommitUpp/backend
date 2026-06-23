@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
-	"github.com/CommitUpp/backend/api/application/usecase/movie"
+	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
 	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
@@ -49,6 +49,7 @@ func main() {
 		log.Fatalf("failed to create database pool: %v", err)
 	}
 	defer dbPool.Close()
+
 	if err := dbPool.Ping(ctx); err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
@@ -75,6 +76,8 @@ func main() {
 	authHandler := handler.NewAuthHandler(authUsecase)
 	groupHandler := handler.NewGroupHandler(groupUsecase)
 	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
+	movieRepository := postgres.NewMovieRepository(dbPool)
+	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
 
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
@@ -87,11 +90,14 @@ func main() {
 	}
 
 	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL, supabaseAnonKey)
-	movieStatusUsecase := movie.NewMovieStatusUsecase(movieStatusRepository)
+	movieStatusUsecase := movieusecase.NewMovieStatusUsecase(movieStatusRepository)
+
+	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
 
 	server := handler.NewServer(
 		authHandler,
+		moviesHandler,
 		movieStatusHandler,
 		groupHandler,
 		groupWatchedMovieHandler,
