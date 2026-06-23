@@ -22,7 +22,7 @@ func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	//	リクエストボディのバインド
-	var req UpdateMovieStatusRequest
+	var req MovieStatusRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, BadRequestError{Message: "リクエストの形式が不正です"})
 	}
@@ -59,7 +59,7 @@ func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "ステータスの更新に失敗しました"})
 	}
 
-	return c.JSON(http.StatusOK, UpdateMovieStatusResponse{Status: "success"})
+	return c.JSON(http.StatusOK, MovieStatusResponse{Status: "success"})
 }
 
 func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatusParams) error {

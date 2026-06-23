@@ -78,7 +78,7 @@ components:
         status:
           type: string
 
-    UpdateMovieStatusRequest:
+    MovieStatusRequest:
       type: object
       required:
         - movie_id
@@ -91,7 +91,7 @@ components:
           type: string
           enum: [watched, wanna_watch]
 
-    UpdateMovieStatusResponse:
+    MovieStatusResponse:
       type: object
       required:
         - status

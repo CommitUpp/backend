@@ -46,14 +46,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/UpdateMovieStatusRequest'
+          $ref: '#/components/schemas/MovieStatusRequest'
   responses:
     '200':
       description: ステータス更新成功
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UpdateMovieStatusResponse'
+            $ref: '#/components/schemas/MovieStatusResponse'
     '400':
       description: バリデーションエラー
       content:
