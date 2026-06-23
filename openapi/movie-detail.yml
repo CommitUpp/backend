@@ -1,0 +1,38 @@
+get:
+  summary: 映画詳細取得API
+  operationId: getMovie
+  security:
+    - SupabaseAuth: []
+  parameters:
+    - name: movie_id
+      in: path
+      description: 映画のID
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: 映画詳細取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MovieDetail'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
