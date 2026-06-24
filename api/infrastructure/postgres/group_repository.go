@@ -55,3 +55,22 @@ func (r *GroupRepository) CreateGroupWithOwner(ctx context.Context, input reposi
 
 	return createdGroup, nil
 }
+
+// 指定されたユーザーが指定されたグループのメンバーであるかを確認
+func (r *GroupRepository) IsGroupMember(ctx context.Context, userID string, groupID string) (bool, error) {
+	const query = `
+		SELECT EXISTS (
+			SELECT 1
+			FROM group_members
+			WHERE group_id = $1
+			  AND user_id = $2
+		)
+	`
+
+	var exists bool
+	if err := r.pool.QueryRow(ctx, query, groupID, userID).Scan(&exists); err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}

@@ -62,10 +62,19 @@ func main() {
 	pbClient := pb.NewAuthServiceClient(conn)
 	authGateway := grpc.NewAuthGateway(pbClient)
 	authUsecase := user.NewAuthUsecase(authGateway)
+
 	groupRepository := postgres.NewGroupRepository(dbPool)
 	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
+
+	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
+	groupWatchedMovieUsecase := groupusecase.NewGroupWatchedMovieUsecase(
+		groupRepository,
+		groupWatchedMovieRepository,
+	)
+
 	authHandler := handler.NewAuthHandler(authUsecase)
 	groupHandler := handler.NewGroupHandler(groupUsecase)
+	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
 
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
@@ -81,7 +90,12 @@ func main() {
 	movieStatusUsecase := movie.NewMovieStatusUsecase(movieStatusRepository)
 	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
 
-	server := handler.NewServer(authHandler, movieStatusHandler, groupHandler)
+	server := handler.NewServer(
+		authHandler,
+		movieStatusHandler,
+		groupHandler,
+		groupWatchedMovieHandler,
+	)
 
 	routerConfig := router.RouterConfig{
 		AuthUsecase: authUsecase,
