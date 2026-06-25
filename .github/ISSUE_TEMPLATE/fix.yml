@@ -1,0 +1,29 @@
+name: 修正（Fix）
+description: 既存コード・設定・YAMLなどの修正
+title: "[Fix] "
+labels: ["fix"]
+body:
+  - type: textarea
+    id: target
+    attributes:
+      label: 修正対象
+      placeholder: 例）docker-compose.yml / WebSocket接続処理 / README
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 修正理由
+      placeholder: 例）接続先URLがlocalhost固定になっているため
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 作業内容
+      value: |
+        - [ ] 修正箇所を確認
+        - [ ] 修正
+        - [ ] 動作確認
