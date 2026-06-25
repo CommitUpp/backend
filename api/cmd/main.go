@@ -60,25 +60,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	pbClient := pb.NewAuthServiceClient(conn)
-	authGateway := grpc.NewAuthGateway(pbClient)
-	authUsecase := user.NewAuthUsecase(authGateway)
-
-	groupRepository := postgres.NewGroupRepository(dbPool)
-	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
-
-	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
-	groupWatchedMovieUsecase := groupusecase.NewGroupWatchedMovieUsecase(
-		groupRepository,
-		groupWatchedMovieRepository,
-	)
-
-	authHandler := handler.NewAuthHandler(authUsecase)
-	groupHandler := handler.NewGroupHandler(groupUsecase)
-	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
-	movieRepository := postgres.NewMovieRepository(dbPool)
-	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
-
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
 		log.Fatal("PUBLIC_SUPABASE_URL is required")
@@ -89,9 +70,29 @@ func main() {
 		log.Fatal("SUPABASE_ANON_KEY is required")
 	}
 
+	pbClient := pb.NewAuthServiceClient(conn)
+	authGateway := grpc.NewAuthGateway(pbClient)
+	authUsecase := user.NewAuthUsecase(authGateway)
+
+	// repository
+	groupRepository := postgres.NewGroupRepository(dbPool)
+	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
+	movieRepository := postgres.NewMovieRepository(dbPool)
 	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL, supabaseAnonKey)
+
+	// usecase
+	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
+	groupWatchedMovieUsecase := groupusecase.NewGroupWatchedMovieUsecase(
+		groupRepository,
+		groupWatchedMovieRepository,
+	)
+	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
 	movieStatusUsecase := movieusecase.NewMovieStatusUsecase(movieStatusRepository)
 
+	// handler
+	authHandler := handler.NewAuthHandler(authUsecase)
+	groupHandler := handler.NewGroupHandler(groupUsecase)
+	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
 	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
 
