@@ -13,6 +13,8 @@ paths:
     $ref: './user-login-callback.yml'
   /user/logout:
     $ref: './user-logout.yml'
+  /movies:
+    $ref: './movies.yml'
   /movie/status:
     $ref: './movie-status.yml'
   /groups/{group_id}/watched-movies:
@@ -78,6 +80,33 @@ components:
         - status
       properties:
         status:
+          type: string
+
+    MoviesResponse:
+      type: object
+      required:
+        - movies
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Movie'
+
+    Movie:
+      type: object
+      required:
+        - movie_id
+        - tmdb_id
+        - title
+        - poster_url
+      properties:
+        movie_id:
+          type: string
+        tmdb_id:
+          type: string
+        title:
+          type: string
+        poster_url:
           type: string
 
     MovieStatusRequest:

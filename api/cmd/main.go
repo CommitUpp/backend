@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
-	"github.com/CommitUpp/backend/api/application/usecase/movie"
+	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
 	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
@@ -49,6 +49,7 @@ func main() {
 		log.Fatalf("failed to create database pool: %v", err)
 	}
 	defer dbPool.Close()
+
 	if err := dbPool.Ping(ctx); err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
@@ -58,23 +59,6 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-
-	pbClient := pb.NewAuthServiceClient(conn)
-	authGateway := grpc.NewAuthGateway(pbClient)
-	authUsecase := user.NewAuthUsecase(authGateway)
-
-	groupRepository := postgres.NewGroupRepository(dbPool)
-	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
-
-	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
-	groupWatchedMovieUsecase := groupusecase.NewGroupWatchedMovieUsecase(
-		groupRepository,
-		groupWatchedMovieRepository,
-	)
-
-	authHandler := handler.NewAuthHandler(authUsecase)
-	groupHandler := handler.NewGroupHandler(groupUsecase)
-	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
 
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
@@ -86,12 +70,35 @@ func main() {
 		log.Fatal("SUPABASE_ANON_KEY is required")
 	}
 
+	pbClient := pb.NewAuthServiceClient(conn)
+	authGateway := grpc.NewAuthGateway(pbClient)
+	authUsecase := user.NewAuthUsecase(authGateway)
+
+	// repository
+	groupRepository := postgres.NewGroupRepository(dbPool)
+	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
+	movieRepository := postgres.NewMovieRepository(dbPool)
 	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL, supabaseAnonKey)
-	movieStatusUsecase := movie.NewMovieStatusUsecase(movieStatusRepository)
+
+	// usecase
+	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
+	groupWatchedMovieUsecase := groupusecase.NewGroupWatchedMovieUsecase(
+		groupRepository,
+		groupWatchedMovieRepository,
+	)
+	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
+	movieStatusUsecase := movieusecase.NewMovieStatusUsecase(movieStatusRepository)
+
+	// handler
+	authHandler := handler.NewAuthHandler(authUsecase)
+	groupHandler := handler.NewGroupHandler(groupUsecase)
+	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
+	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
 
 	server := handler.NewServer(
 		authHandler,
+		moviesHandler,
 		movieStatusHandler,
 		groupHandler,
 		groupWatchedMovieHandler,

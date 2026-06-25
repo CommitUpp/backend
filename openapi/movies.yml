@@ -1,0 +1,37 @@
+get:
+  summary: 映画一覧取得API
+  operationId: getMovies
+  security:
+    - SupabaseAuth: []
+  parameters:
+    - name: keyword
+      in: query
+      description: 映画タイトルで絞り込む検索キーワード
+      required: false
+      schema:
+        type: string
+  responses:
+    '200':
+      description: 映画一覧取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
