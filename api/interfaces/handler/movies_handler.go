@@ -42,6 +42,7 @@ func (h *MoviesHandler) GetMovies(
 	for _, m := range movies {
 		res = append(res, Movie{
 			MovieId:   m.MovieID,
+			TmdbId:    m.TMDBID,
 			Title:     m.Title,
 			PosterUrl: m.PosterURL,
 		})

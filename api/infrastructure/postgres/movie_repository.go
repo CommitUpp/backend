@@ -25,12 +25,12 @@ func (r *movieRepository) GetMovies(ctx context.Context, keyword string) ([]repo
 
 	if keyword == "" {
 		rows, err = r.db.Query(ctx, `
-			SELECT id, title, poster_url
+			SELECT id, tmdb_id, title, poster_url
 			FROM movies
 		`)
 	} else {
 		rows, err = r.db.Query(ctx, `
-			SELECT id, title, poster_url
+			SELECT id, tmdb_id, title, poster_url
 			FROM movies
 			WHERE title ILIKE '%' || $1 || '%'
 		`, keyword)
@@ -45,7 +45,7 @@ func (r *movieRepository) GetMovies(ctx context.Context, keyword string) ([]repo
 
 	for rows.Next() {
 		var m repository.Movie
-		if err := rows.Scan(&m.MovieID, &m.Title, &m.PosterURL); err != nil {
+		if err := rows.Scan(&m.MovieID, &m.TMDBID, &m.Title, &m.PosterURL); err != nil {
 			return nil, err
 		}
 		movies = append(movies, m)
