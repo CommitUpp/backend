@@ -15,11 +15,37 @@ func NewMovieDetailRepository(db *pgxpool.Pool) *movieDetailRepository {
 	return &movieDetailRepository{db: db}
 }
 
-func (r *movieDetailRepository) GetMovieDetail(ctx context.Context, movieID string) (*repository.MovieDetail, error) {
+func (r *movieDetailRepository) IsGroupMember(
+	ctx context.Context,
+	groupID string,
+	userID string,
+) (bool, error) {
+	var exists bool
+
+	err := r.db.QueryRow(ctx, `
+		SELECT EXISTS (
+			SELECT 1
+			FROM group_members
+			WHERE group_id = $1
+			  AND user_id = $2
+		)
+	`, groupID, userID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func (r *movieDetailRepository) GetMovieDetail(
+	ctx context.Context,
+	movieID string,
+	groupID string,
+	userID string,
+) (*repository.MovieDetail, error) {
 	var movieDetail repository.MovieDetail
 	var posterPath string
 
-	// 映画本体の情報を取得
 	err := r.db.QueryRow(ctx, `
 		SELECT
 			id,
@@ -44,17 +70,14 @@ func (r *movieDetailRepository) GetMovieDetail(ctx context.Context, movieID stri
 		return nil, err
 	}
 
-	// poster_url をフルパスに変換する場合はここで組み立てる
 	movieDetail.PosterURL = posterPath
 
-	// watched_user を取得
-	watchedUsers, err := r.getWatchedUsers(ctx, movieID)
+	watchedUsers, err := r.getWatchedUsers(ctx, movieID, userID)
 	if err != nil {
 		return nil, err
 	}
 	movieDetail.WatchedUser = watchedUsers
 
-	// streaming_services を取得
 	streamingServices, err := r.getStreamingServices(ctx, movieID)
 	if err != nil {
 		return nil, err
@@ -64,7 +87,12 @@ func (r *movieDetailRepository) GetMovieDetail(ctx context.Context, movieID stri
 	return &movieDetail, nil
 }
 
-func (r *movieDetailRepository) getWatchedUsers(ctx context.Context, movieID string) ([]repository.WatchedUser, error) {
+// watched_userの組み立て
+func (r *movieDetailRepository) getWatchedUsers(
+	ctx context.Context,
+	movieID string,
+	userID string,
+) ([]repository.WatchedUser, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT
 			u.id,
@@ -74,8 +102,9 @@ func (r *movieDetailRepository) getWatchedUsers(ctx context.Context, movieID str
 			ON u.id = ws.user_id
 		WHERE ws.movie_id = $1
 			AND ws.status = 'watched'
+			AND ws.user_id <> $2
 		ORDER BY u.id
-	`, movieID)
+	`, movieID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +113,14 @@ func (r *movieDetailRepository) getWatchedUsers(ctx context.Context, movieID str
 	watchedUsers := make([]repository.WatchedUser, 0)
 	for rows.Next() {
 		var user repository.WatchedUser
+
 		if err := rows.Scan(
 			&user.UserID,
 			&user.AvatarURL,
 		); err != nil {
 			return nil, err
 		}
+
 		watchedUsers = append(watchedUsers, user)
 	}
 
@@ -100,13 +131,17 @@ func (r *movieDetailRepository) getWatchedUsers(ctx context.Context, movieID str
 	return watchedUsers, nil
 }
 
-func (r *movieDetailRepository) getStreamingServices(ctx context.Context, movieID string) ([]string, error) {
+// streaming_servicesの組み立て
+func (r *movieDetailRepository) getStreamingServices(
+	ctx context.Context,
+	movieID string,
+) ([]string, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT
-				ss.name
+			ss.name
 		FROM movie_streamings ms
 		INNER JOIN streaming_services ss
-				ON ss.id = ms.service_id
+			ON ss.id = ms.service_id
 		WHERE ms.movie_id = $1
 		ORDER BY ss.name
 	`, movieID)

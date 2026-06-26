@@ -5,7 +5,8 @@ import (
 )
 
 type MovieDetailRepository interface {
-	GetMovieDetail(ctx context.Context, movieID string) (*MovieDetail, error)
+	IsGroupMember(ctx context.Context, groupID string, userID string) (bool, error)
+	GetMovieDetail(ctx context.Context, movieID string, groupID string, userID string) (*MovieDetail, error)
 }
 
 type MovieDetail struct {
