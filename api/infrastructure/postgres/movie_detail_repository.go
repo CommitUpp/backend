@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/CommitUpp/backend/api/domain/repository"
+	"github.com/CommitUpp/backend/api/lib/tmdb"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -45,6 +46,7 @@ func (r *movieDetailRepository) GetMovieDetail(
 ) (*repository.MovieDetail, error) {
 	var movieDetail repository.MovieDetail
 	var posterPath string
+	var trailerPath string
 
 	err := r.db.QueryRow(ctx, `
 		SELECT
@@ -62,7 +64,7 @@ func (r *movieDetailRepository) GetMovieDetail(
 		&movieDetail.TMDBID,
 		&movieDetail.Title,
 		&posterPath,
-		&movieDetail.TrailerURL,
+		&trailerPath,
 		&movieDetail.Overview,
 		&movieDetail.ReleaseDate,
 	)
@@ -70,7 +72,8 @@ func (r *movieDetailRepository) GetMovieDetail(
 		return nil, err
 	}
 
-	movieDetail.PosterURL = posterPath
+	movieDetail.PosterURL = tmdb.BuildPosterURL(posterPath)
+	movieDetail.TrailerURL = tmdb.BuildBackdropURL(trailerPath)
 
 	watchedUsers, err := r.getWatchedUsers(ctx, movieID, userID)
 	if err != nil {
