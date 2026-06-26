@@ -1,6 +1,6 @@
 get:
   summary: 映画詳細取得API
-  operationId: getMovie
+  operationId: getMovieDetail
   security:
     - SupabaseAuth: []
   parameters:
