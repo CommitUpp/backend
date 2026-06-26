@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/CommitUpp/backend/api/domain/repository"
+	"github.com/CommitUpp/backend/api/lib/tmdb"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -44,10 +45,17 @@ func (r *movieRepository) GetMovies(ctx context.Context, keyword string) ([]repo
 	var movies []repository.Movie
 
 	for rows.Next() {
-		var m repository.Movie
-		if err := rows.Scan(&m.MovieID, &m.TMDBID, &m.Title, &m.PosterURL); err != nil {
+		var (
+			m          repository.Movie
+			posterPath string
+		)
+
+		if err := rows.Scan(&m.MovieID, &m.TMDBID, &m.Title, &posterPath); err != nil {
 			return nil, err
 		}
+
+		m.PosterURL = tmdb.BuildPosterURL(posterPath)
+
 		movies = append(movies, m)
 	}
 

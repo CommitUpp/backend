@@ -5,6 +5,7 @@ import (
 
 	domainrepo "github.com/CommitUpp/backend/api/domain/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/CommitUpp/backend/api/lib/tmdb"
 )
 
 type GroupWatchedMovieRepository struct {
@@ -57,18 +58,26 @@ func (r *GroupWatchedMovieRepository) GetWatchedMovies(
 	defer rows.Close()
 
 	watchedMovies := make([]domainrepo.GroupWatchedMovieRow, 0)
+	
 	for rows.Next() {
-		var row domainrepo.GroupWatchedMovieRow
+		var (
+			row        domainrepo.GroupWatchedMovieRow
+			posterPath string
+		)
+
 		if err := rows.Scan(
 			&row.GroupID,
 			&row.MovieID,
 			&row.Title,
-			&row.PosterURL,
+			&posterPath,
 			&row.UserID,
 			&row.AvatarURL,
 		); err != nil {
 			return nil, err
 		}
+
+		row.PosterURL = tmdb.BuildPosterURL(posterPath)
+
 		watchedMovies = append(watchedMovies, row)
 	}
 

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/CommitUpp/backend/api/domain/repository"
+	"github.com/CommitUpp/backend/api/lib/tmdb"
 	"github.com/supabase-community/postgrest-go"
 )
 
@@ -92,8 +93,8 @@ func (r *MovieStatusRepository) GetWatchStatuses(ctx context.Context, userID str
 			MovieID:     row.MovieID,
 			TMDBID:      row.Movie.TMDBID,
 			Title:       row.Movie.Title,
-			PosterURL:   row.Movie.PosterURL,
-			TrailerURL:  row.Movie.TrailerURL,
+			PosterURL: tmdb.BuildPosterURL(row.Movie.PosterURL),
+			TrailerURL:  tmdb.BuildBackdropURL(row.Movie.TrailerURL),
 			Overview:    row.Movie.Overview,
 			ReleaseDate: row.Movie.ReleaseDate,
 			UpdatedAt:   row.UpdatedAt,
