@@ -78,6 +78,7 @@ func main() {
 	groupRepository := postgres.NewGroupRepository(dbPool)
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
 	movieRepository := postgres.NewMovieRepository(dbPool)
+	movieDetailRepository := postgres.NewMovieDetailRepository(dbPool)
 	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL, supabaseAnonKey)
 
 	// usecase
@@ -86,6 +87,7 @@ func main() {
 		groupRepository,
 		groupWatchedMovieRepository,
 	)
+	movieDetailUsecase := movieusecase.NewMovieDetailUsecase(movieDetailRepository)
 	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
 	movieStatusUsecase := movieusecase.NewMovieStatusUsecase(movieStatusRepository)
 
@@ -94,11 +96,13 @@ func main() {
 	groupHandler := handler.NewGroupHandler(groupUsecase)
 	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
 	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
+	movieDetailHandler := handler.NewMovieDetailHandler(movieDetailUsecase)
 	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
 
 	server := handler.NewServer(
 		authHandler,
 		moviesHandler,
+		movieDetailHandler,
 		movieStatusHandler,
 		groupHandler,
 		groupWatchedMovieHandler,
