@@ -1,0 +1,42 @@
+name: 機能追加
+description: 新しい機能を作るIssue
+title: "[Feature] "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: overview
+    attributes:
+      label: 概要
+      description: 何を作るか
+      placeholder: 例）ルーム作成機能を作る
+    validations:
+      required: true
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: なぜ必要か
+      placeholder: 例）ユーザーが同じ部屋に参加できるようにするため
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: タスク
+      value: |
+        - [ ] API設計
+        - [ ] 実装
+        - [ ] 動作確認
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      value: |
+        - [ ] ルームを作成できる
+        - [ ] ルームIDで参加できる
+        - [ ] エラー時の表示がある

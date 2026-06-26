@@ -1,0 +1,21 @@
+name: 作業タスク
+description: 実装以外の調査・設定・整理
+title: "[Task] "
+labels: ["task"]
+body:
+  - type: textarea
+    id: overview
+    attributes:
+      label: 作業内容
+      placeholder: 例）FastAPIのWebSocket構成を調査する
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: タスク
+      value: |
+        - [ ] 実装
+        - [ ] テスト
+        - [ ] README更新
