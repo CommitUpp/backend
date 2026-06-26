@@ -23,5 +23,6 @@ type MovieDetail struct {
 
 type WatchedUser struct {
 	UserID    string
+	UserName  string
 	AvatarURL string
 }

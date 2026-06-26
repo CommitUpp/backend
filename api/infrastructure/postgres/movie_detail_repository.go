@@ -99,6 +99,7 @@ func (r *movieDetailRepository) getWatchedUsers(
 	rows, err := r.db.Query(ctx, `
 		SELECT
 			u.id,
+			u.name,
 			u.avatar_url
 		FROM watch_statuses ws
 		INNER JOIN users u
@@ -119,6 +120,7 @@ func (r *movieDetailRepository) getWatchedUsers(
 
 		if err := rows.Scan(
 			&user.UserID,
+			&user.UserName,
 			&user.AvatarURL,
 		); err != nil {
 			return nil, err
