@@ -94,7 +94,7 @@ func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatu
 		if err.Error() == "user ID is required" || err.Error() == "access token is required" {
 			return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
 		}
-		log.Printf("failed to get movie statuses: user_id=%s status=%s err=%v", userIDStr, status, err)
+		log.Printf("failed to get movie statuses: user_id=%s status=%v err=%v", userIDStr, status, err)
 		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "映画一覧の取得に失敗しました"})
 	}
 

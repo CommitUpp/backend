@@ -2,7 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrGroupNotFound            = errors.New("group not found")
+	ErrGroupMemberAlreadyExists = errors.New("group member already exists")
 )
 
 // role に保存する権限種別
@@ -18,8 +24,12 @@ const (
 type CreateGroupWithOwnerInput struct {
 	Name        string
 	MonthlyGoal int
-	OwnerUserID string
-	OwnerRole   GroupMemberRole
+	AccessToken string
+}
+
+type JoinGroupInput struct {
+	GroupID     string
+	AccessToken string
 }
 
 // groups作成後にDBから返してほしい値です。
@@ -32,4 +42,5 @@ type CreatedGroup struct {
 
 type GroupRepository interface {
 	CreateGroupWithOwner(ctx context.Context, input CreateGroupWithOwnerInput) (CreatedGroup, error)
+	JoinGroup(ctx context.Context, input JoinGroupInput) (CreatedGroup, error)
 }

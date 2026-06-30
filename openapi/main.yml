@@ -9,6 +9,8 @@ servers:
 paths:
   /groups:
     $ref: './group-create.yml'
+  /groups/{group_id}/join:
+    $ref: './group-join.yml'
   /user/callback:
     $ref: './user-login-callback.yml'
   /user/logout:
@@ -35,6 +37,14 @@ components:
           maxLength: 50
 
     CreateGroupResponse:
+      type: object
+      required:
+        - group
+      properties:
+        group:
+          $ref: '#/components/schemas/Group'
+
+    JoinGroupResponse:
       type: object
       required:
         - group
@@ -149,6 +159,14 @@ components:
           type: string
 
     UnauthorizedError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    ConflictError:
       type: object
       required:
         - message

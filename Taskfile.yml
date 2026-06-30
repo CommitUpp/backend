@@ -7,6 +7,7 @@ tasks:
       - openapi/cfg.yml
       - openapi/main.yml
       - openapi/group-create.yml
+      - openapi/group-join.yml
       - openapi/user-login-callback.yml
       - openapi/user-logout.yml
       - openapi/movie-status.yml

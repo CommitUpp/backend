@@ -1,0 +1,49 @@
+post:
+  summary: 既存グループ参加API
+  operationId: joinGroup
+  security:
+    - SupabaseAuth: []
+  parameters:
+    - name: group_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: グループ参加成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JoinGroupResponse'
+    '400':
+      description: リクエスト不正（バリデーションエラーなど）
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '404':
+      description: グループが存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '409':
+      description: 既にグループに参加済み
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
