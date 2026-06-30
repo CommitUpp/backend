@@ -10,14 +10,15 @@ import (
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
 	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
+	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
 	"github.com/CommitUpp/backend/api/infrastructure/postgres"
 	"github.com/CommitUpp/backend/api/interfaces/grpc/pb"
 	"github.com/CommitUpp/backend/api/interfaces/handler"
 	"github.com/CommitUpp/backend/api/interfaces/router"
-
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	ggrpc "google.golang.org/grpc"
@@ -59,6 +60,10 @@ func main() {
 	}
 	defer conn.Close()
 
+	pbClient := pb.NewAuthServiceClient(conn)
+	authGateway := grpc.NewAuthGateway(pbClient)
+	authUsecase := user.NewAuthUsecase(authGateway)
+
 	supabaseURL := strings.TrimRight(os.Getenv("PUBLIC_SUPABASE_URL"), "/")
 	if supabaseURL == "" {
 		log.Fatal("PUBLIC_SUPABASE_URL is required")
@@ -69,12 +74,7 @@ func main() {
 		log.Fatal("SUPABASE_ANON_KEY is required")
 	}
 
-	pbClient := pb.NewAuthServiceClient(conn)
-	authGateway := grpc.NewAuthGateway(pbClient)
-	authUsecase := user.NewAuthUsecase(authGateway)
-
-	// repository
-	groupRepository := postgres.NewGroupRepository(dbPool)
+	groupRepository := infrastructure.NewGroupRepository(supabaseURL, supabaseAnonKey)
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
 	movieRepository := postgres.NewMovieRepository(dbPool)
 	movieDetailRepository := postgres.NewMovieDetailRepository(dbPool)

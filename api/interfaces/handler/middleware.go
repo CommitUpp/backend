@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/CommitUpp/backend/api/application/usecase/user"
@@ -24,6 +25,7 @@ func SupabaseAuthMiddleware(authUsecase user.AuthUsecase) echo.MiddlewareFunc {
 
 			userID, err := authUsecase.VerifyToken(ctx, token)
 			if err != nil || userID == "" {
+				log.Printf("failed to verify token: user_id_empty=%t err=%v", userID == "", err)
 				return c.JSON(http.StatusUnauthorized, map[string]string{"message": "invalid token"})
 			}
 

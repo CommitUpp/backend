@@ -36,10 +36,15 @@ func (h *GroupWatchedMovieHandler) GetGroupWatchedMovies(c echo.Context, groupId
 		return c.JSON(http.StatusBadRequest, BadRequestError{Message: "グループIDが指定されていません"})
 	}
 
-	watchedMovies, err := h.groupWatchedMovieUsecase.GetWatchedMovies(ctx, userIDStr, groupId)
+	accessToken, ok := c.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
+	}
+
+	watchedMovies, err := h.groupWatchedMovieUsecase.GetWatchedMovies(ctx, userIDStr, groupId, accessToken)
 	if err != nil {
 		switch {
-		case errors.Is(err, group.ErrUserIDRequired):
+		case errors.Is(err, group.ErrUserIDRequired), errors.Is(err, group.ErrAccessTokenRequired):
 			return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
 		case errors.Is(err, group.ErrGroupIDRequired):
 			return c.JSON(http.StatusBadRequest, BadRequestError{Message: "グループIDが指定されていません"})

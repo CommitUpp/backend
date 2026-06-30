@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
-	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/labstack/echo/v4"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 type MovieDetailHandler struct {
@@ -39,11 +39,19 @@ func (h *MovieDetailHandler) GetMovieDetail(
 		})
 	}
 
+	accessToken, ok := c.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: "認証情報が見つかりません",
+		})
+	}
+
 	movieDetail, err := h.usecase.GetMovieDetail(
 		c.Request().Context(),
 		movieId.String(),
 		params.GroupId.String(),
 		userIDStr,
+		accessToken,
 	)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, InternalServerError{
