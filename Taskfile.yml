@@ -11,8 +11,8 @@ tasks:
       - openapi/user-logout.yml
       - openapi/movies.yml
       - openapi/movie-detail.yml
-      - openapi/movie-status.yml
-      - openapi/group-movie-statuses.yml
+      - openapi/user-movie-status.yml
+      - openapi/group-watched-movies.yml
       - proto/auth.proto
     generates:
       # OpenAPIの出力先

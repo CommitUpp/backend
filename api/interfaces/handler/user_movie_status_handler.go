@@ -4,25 +4,25 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CommitUpp/backend/api/application/usecase/movie"
+	"github.com/CommitUpp/backend/api/application/usecase/user"
 	"github.com/labstack/echo/v4"
 )
 
-type MovieStatusHandler struct {
-	movieStatusUsecase movie.MovieStatusUsecase
+type UserMovieStatusHandler struct {
+	movieStatusUsecase user.UserMovieStatusUsecase
 }
 
-func NewMovieStatusHandler(u movie.MovieStatusUsecase) *MovieStatusHandler {
-	return &MovieStatusHandler{
+func NewUserMovieStatusHandler(u user.UserMovieStatusUsecase) *UserMovieStatusHandler {
+	return &UserMovieStatusHandler{
 		movieStatusUsecase: u,
 	}
 }
 
-func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
+func (h *UserMovieStatusHandler) WatchStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	//	リクエストボディのバインド
-	var req MovieStatusRequest
+	var req UserMovieStatusRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, BadRequestError{Message: "リクエストの形式が不正です"})
 	}
@@ -59,10 +59,10 @@ func (h *MovieStatusHandler) WatchStatus(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "ステータスの更新に失敗しました"})
 	}
 
-	return c.JSON(http.StatusOK, MovieStatusResponse{Status: "success"})
+	return c.JSON(http.StatusOK, UserMovieStatusResponse{Status: "success"})
 }
 
-func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatusParams) error {
+func (h *UserMovieStatusHandler) GetUserMovieStatus(c echo.Context, params GetUserMovieStatusParams) error {
 	ctx := c.Request().Context()
 
 	var status *string
@@ -94,13 +94,13 @@ func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatu
 		if err.Error() == "user ID is required" || err.Error() == "access token is required" {
 			return c.JSON(http.StatusUnauthorized, UnauthorizedError{Message: "認証情報が見つかりません"})
 		}
-		log.Printf("failed to get movie statuses: user_id=%s status=%s err=%v", userIDStr, status, err)
+		log.Printf("failed to get movie statuses: user_id=%s status=%v err=%v", userIDStr, status, err)
 		return c.JSON(http.StatusInternalServerError, InternalServerError{Message: "映画一覧の取得に失敗しました"})
 	}
 
-	movies := make([]GetMovieStatus, 0, len(movieStatuses))
+	movies := make([]GetUserMovieStatus, 0, len(movieStatuses))
 	for _, movieStatus := range movieStatuses {
-		movies = append(movies, GetMovieStatus{
+		movies = append(movies, GetUserMovieStatus{
 			MovieId:     movieStatus.MovieID,
 			TmdbId:      movieStatus.TMDBID,
 			Title:       movieStatus.Title,
@@ -112,5 +112,5 @@ func (h *MovieStatusHandler) GetMovieStatus(c echo.Context, params GetMovieStatu
 		})
 	}
 
-	return c.JSON(http.StatusOK, GetMovieStatusResponse{Movies: movies})
+	return c.JSON(http.StatusOK, GetUserMovieStatusResponse{Movies: movies})
 }

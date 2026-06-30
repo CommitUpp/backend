@@ -17,8 +17,8 @@ paths:
     $ref: './movies.yml'
   /movies/{movie_id}:
     $ref: './movie-detail.yml'
-  /movie/status:
-    $ref: './movie-status.yml'
+  /user/movie/status:
+    $ref: './user-movie-status.yml'
   /groups/{group_id}/watched-movies:
     $ref: './group-watched-movies.yml'
 
@@ -147,7 +147,7 @@ components:
           items:
             type: string
 
-    MovieStatusRequest:
+    UserMovieStatusRequest:
       type: object
       required:
         - movie_id
@@ -160,7 +160,7 @@ components:
           type: string
           enum: [watched, wanna_watch]
 
-    MovieStatusResponse:
+    UserMovieStatusResponse:
       type: object
       required:
         - status
@@ -169,7 +169,7 @@ components:
           type: string
           example: success
 
-    GetMovieStatus:
+    GetUserMovieStatus:
       type: object
       required:
         - movie_id
@@ -199,7 +199,7 @@ components:
           type: string
           format: date-time
 
-    GetMovieStatusResponse:
+    GetUserMovieStatusResponse:
       type: object
       required:
         - movies
@@ -207,7 +207,7 @@ components:
         movies:
           type: array
           items:
-            $ref: "#/components/schemas/GetMovieStatus"
+            $ref: "#/components/schemas/GetUserMovieStatus"
 
     GetGroupWatchedMoviesResponse:
       type: object

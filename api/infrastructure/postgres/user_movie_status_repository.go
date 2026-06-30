@@ -1,4 +1,4 @@
-package infrastructure
+package postgres
 
 import (
 	"context"
@@ -10,20 +10,19 @@ import (
 	"github.com/supabase-community/postgrest-go"
 )
 
-type MovieStatusRepository struct {
+type UserMovieStatusRepository struct {
 	baseURL string
 	apiKey  string
 }
 
-func NewMovieStatusRepository(baseURL string, apiKey string) repository.MovieStatusRepository {
-	return &MovieStatusRepository{
+func NewUserMovieStatusRepository(baseURL string, apiKey string) repository.UserMovieStatusRepository {
+	return &UserMovieStatusRepository{
 		baseURL: strings.TrimRight(baseURL, "/") + "/rest/v1",
 		apiKey:  apiKey,
 	}
 }
 
-func (r *MovieStatusRepository) WatchStatus(ctx context.Context, movieID string, userID string, status string, accessToken string) error {
-	// データを作成
+func (r *UserMovieStatusRepository) WatchStatus(ctx context.Context, movieID string, userID string, status string, accessToken string) error {
 	row := map[string]interface{}{
 		"user_id":  userID,
 		"movie_id": movieID,
@@ -42,12 +41,10 @@ func (r *MovieStatusRepository) WatchStatus(ctx context.Context, movieID string,
 		return client.ClientError
 	}
 
-	// watch_statusesに登録
 	_, _, err := client.
 		From("watch_statuses").
 		Upsert(row, "user_id,movie_id", "minimal", "merge").
 		ExecuteWithContext(ctx)
-
 	if err != nil {
 		return err
 	}
@@ -55,7 +52,7 @@ func (r *MovieStatusRepository) WatchStatus(ctx context.Context, movieID string,
 	return nil
 }
 
-func (r *MovieStatusRepository) GetWatchStatuses(ctx context.Context, userID string, status *string, accessToken string) ([]repository.MovieStatus, error) {
+func (r *UserMovieStatusRepository) GetWatchStatuses(ctx context.Context, userID string, status *string, accessToken string) ([]repository.UserMovieStatus, error) {
 	client := postgrest.NewClient(
 		r.baseURL,
 		"public",
@@ -82,18 +79,18 @@ func (r *MovieStatusRepository) GetWatchStatuses(ctx context.Context, userID str
 		query = query.Eq("status", *status)
 	}
 
-	var rows []watchStatusRow
+	var rows []userMovieStatusRow
 	if _, err := query.ExecuteToWithContext(ctx, &rows); err != nil {
 		return nil, err
 	}
 
-	movies := make([]repository.MovieStatus, 0, len(rows))
+	movies := make([]repository.UserMovieStatus, 0, len(rows))
 	for _, row := range rows {
-		movies = append(movies, repository.MovieStatus{
+		movies = append(movies, repository.UserMovieStatus{
 			MovieID:     row.MovieID,
 			TMDBID:      row.Movie.TMDBID,
 			Title:       row.Movie.Title,
-			PosterURL: tmdb.BuildPosterURL(row.Movie.PosterURL),
+			PosterURL:   tmdb.BuildPosterURL(row.Movie.PosterURL),
 			TrailerURL:  tmdb.BuildBackdropURL(row.Movie.TrailerURL),
 			Overview:    row.Movie.Overview,
 			ReleaseDate: row.Movie.ReleaseDate,
@@ -104,13 +101,13 @@ func (r *MovieStatusRepository) GetWatchStatuses(ctx context.Context, userID str
 	return movies, nil
 }
 
-type watchStatusRow struct {
-	MovieID   string       `json:"movie_id"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	Movie     movieRowData `json:"movies"`
+type userMovieStatusRow struct {
+	MovieID   string               `json:"movie_id"`
+	UpdatedAt time.Time            `json:"updated_at"`
+	Movie     userMovieStatusMovie `json:"movies"`
 }
 
-type movieRowData struct {
+type userMovieStatusMovie struct {
 	TMDBID      string `json:"tmdb_id"`
 	Title       string `json:"title"`
 	PosterURL   string `json:"poster_url"`

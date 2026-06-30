@@ -1,6 +1,6 @@
 get:
   summary: 視聴ステータスごとの映画一覧を取得するAPI
-  operationId: getMovieStatus
+  operationId: getUserMovieStatus
   security:
     - SupabaseAuth: []
   parameters:
@@ -16,7 +16,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetMovieStatusResponse'
+            $ref: '#/components/schemas/GetUserMovieStatusResponse'
     '400':
       description: バリデーションエラー
       content:
@@ -46,14 +46,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/MovieStatusRequest'
+          $ref: '#/components/schemas/UserMovieStatusRequest'
   responses:
     '200':
       description: ステータス更新成功
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/MovieStatusResponse'
+            $ref: '#/components/schemas/UserMovieStatusResponse'
     '400':
       description: バリデーションエラー
       content:

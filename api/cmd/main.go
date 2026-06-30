@@ -10,7 +10,6 @@ import (
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
 	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
-	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
 	"github.com/CommitUpp/backend/api/infrastructure/postgres"
 	"github.com/CommitUpp/backend/api/interfaces/grpc/pb"
@@ -79,7 +78,7 @@ func main() {
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
 	movieRepository := postgres.NewMovieRepository(dbPool)
 	movieDetailRepository := postgres.NewMovieDetailRepository(dbPool)
-	movieStatusRepository := infrastructure.NewMovieStatusRepository(supabaseURL, supabaseAnonKey)
+	userMovieStatusRepository := postgres.NewUserMovieStatusRepository(supabaseURL, supabaseAnonKey)
 
 	// usecase
 	groupUsecase := groupusecase.NewGroupUsecase(groupRepository)
@@ -89,7 +88,7 @@ func main() {
 	)
 	movieDetailUsecase := movieusecase.NewMovieDetailUsecase(movieDetailRepository)
 	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
-	movieStatusUsecase := movieusecase.NewMovieStatusUsecase(movieStatusRepository)
+	userMovieStatusUsecase := user.NewUserMovieStatusUsecase(userMovieStatusRepository)
 
 	// handler
 	authHandler := handler.NewAuthHandler(authUsecase)
@@ -97,13 +96,13 @@ func main() {
 	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
 	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieDetailHandler := handler.NewMovieDetailHandler(movieDetailUsecase)
-	movieStatusHandler := handler.NewMovieStatusHandler(movieStatusUsecase)
+	userMovieStatusHandler := handler.NewUserMovieStatusHandler(userMovieStatusUsecase)
 
 	server := handler.NewServer(
 		authHandler,
 		moviesHandler,
 		movieDetailHandler,
-		movieStatusHandler,
+		userMovieStatusHandler,
 		groupHandler,
 		groupWatchedMovieHandler,
 	)
