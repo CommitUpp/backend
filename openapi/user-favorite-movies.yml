@@ -40,14 +40,14 @@ put:
     content:
       application/json:
         schema:
-          $ref: '#/components/schemas/FavoriteMovieRequest'
+          $ref: '#/components/schemas/FavoriteMoviesRequest'
   responses:
     '200':
       description: お気に入り映画追加成功
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/FavoriteMovieResponse'
+            $ref: '#/components/schemas/FavoriteMoviesResponse'
     '400':
       description: バリデーションエラー
       content:
