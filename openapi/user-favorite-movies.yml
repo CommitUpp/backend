@@ -32,7 +32,7 @@ get:
 
 put:
   summary: ログインユーザーのお気に入り映画を追加するAPI
-  operationId: addFavoriteMovie
+  operationId: putFavoriteMovies
   security:
     - SupabaseAuth: []
   requestBody:
