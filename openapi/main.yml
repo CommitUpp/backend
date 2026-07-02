@@ -13,6 +13,8 @@ paths:
     $ref: './user-login-callback.yml'
   /user/logout:
     $ref: './user-logout.yml'
+  /user/favorite-movies:
+    $ref: './user-favorite-movies.yml'
   /movies:
     $ref: './movies.yml'
   /movies/{movie_id}:
@@ -208,6 +210,34 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetUserMovieStatus"
+
+    GetFavoriteMoviesResponse:
+      type: object
+      required:
+        - movies
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Movie"
+
+    FavoriteMovieRequest:
+      type: object
+      required:
+        - movie_id
+      properties:
+        movie_id:
+          type: string
+          format: uuid
+
+    FavoriteMovieResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: success
 
     GetGroupWatchedMoviesResponse:
       type: object
