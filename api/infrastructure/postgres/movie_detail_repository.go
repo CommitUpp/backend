@@ -16,28 +16,6 @@ func NewMovieDetailRepository(db *pgxpool.Pool) *movieDetailRepository {
 	return &movieDetailRepository{db: db}
 }
 
-func (r *movieDetailRepository) IsGroupMember(
-	ctx context.Context,
-	groupID string,
-	userID string,
-) (bool, error) {
-	var exists bool
-
-	err := r.db.QueryRow(ctx, `
-		SELECT EXISTS (
-			SELECT 1
-			FROM group_members
-			WHERE group_id = $1
-			  AND user_id = $2
-		)
-	`, groupID, userID).Scan(&exists)
-	if err != nil {
-		return false, err
-	}
-
-	return exists, nil
-}
-
 func (r *movieDetailRepository) GetMovieDetail(
 	ctx context.Context,
 	movieID string,

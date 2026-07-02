@@ -5,7 +5,6 @@ import (
 )
 
 type MovieDetailRepository interface {
-	IsGroupMember(ctx context.Context, groupID string, userID string) (bool, error)
 	GetMovieDetail(ctx context.Context, movieID string, groupID string, userID string) (*MovieDetail, error)
 }
 

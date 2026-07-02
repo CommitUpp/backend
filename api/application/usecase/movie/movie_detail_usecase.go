@@ -15,13 +15,16 @@ var (
 
 type MovieDetailUsecase struct {
 	movieDetailRepository repository.MovieDetailRepository
+	groupRepository       repository.GroupRepository
 }
 
 func NewMovieDetailUsecase(
 	movieDetailRepository repository.MovieDetailRepository,
+	groupRepository repository.GroupRepository,
 ) *MovieDetailUsecase {
 	return &MovieDetailUsecase{
 		movieDetailRepository: movieDetailRepository,
+		groupRepository:       groupRepository,
 	}
 }
 
@@ -39,7 +42,7 @@ func (u *MovieDetailUsecase) GetMovieDetail(
 		return nil, ErrGroupIDRequired
 	}
 
-	isMember, err := u.movieDetailRepository.IsGroupMember(ctx, groupID, userID)
+	isMember, err := u.groupRepository.IsGroupMember(ctx, userID, groupID)
 	if err != nil {
 		return nil, err
 	}
