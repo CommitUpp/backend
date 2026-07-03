@@ -20,14 +20,15 @@ func NewRouter(cfg RouterConfig) *echo.Echo {
 	handler.RegisterHandlersWithOptions(e, cfg.Server, handler.RegisterHandlersOptions{
 		BaseURL: "/api/v1",
 		OperationMiddlewares: map[string][]echo.MiddlewareFunc{
-			"loginCallback":         {authMiddleware},
-			"logout":                {authMiddleware},
-			"watchStatus":           {authMiddleware},
-			"createGroup":           {authMiddleware},
-			"getMovieDetail":        {authMiddleware},
-			"getUserMovieStatus":    {authMiddleware},
-			"getUserFavoriteMovies":    {authMiddleware},
-			"getGroupWatchedMovies": {authMiddleware},
+			"loginCallback":					{authMiddleware},
+			"logout":									{authMiddleware},
+			"watchStatus":						{authMiddleware},
+			"createGroup":						{authMiddleware},
+			"getMovieDetail":					{authMiddleware},
+			"getUserMovieStatus":			{authMiddleware},
+			"getFavoriteMovies":			{authMiddleware},
+			"putFavoriteMovies":			{authMiddleware},
+			"getGroupWatchedMovies":	{authMiddleware},
 		},
 	})
 
