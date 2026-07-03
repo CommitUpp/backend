@@ -99,13 +99,15 @@ func main() {
 	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieDetailHandler := handler.NewMovieDetailHandler(movieDetailUsecase)
 	userMovieStatusHandler := handler.NewUserMovieStatusHandler(userMovieStatusUsecase)
-	userFavoriteMoviesHandler := handler.NewFavoriteMoviesHandler(userFavoriteMoviesUsecase)
+	myFavoriteMoviesHandler := handler.NewMyFavoriteMoviesHandler(userFavoriteMoviesUsecase)
+	userFavoriteMoviesHandler := handler.NewUserFavoriteMoviesHandler(userFavoriteMoviesUsecase)
 
 	server := handler.NewServer(
 		authHandler,
 		moviesHandler,
 		movieDetailHandler,
 		userMovieStatusHandler,
+		myFavoriteMoviesHandler,
 		userFavoriteMoviesHandler,
 		groupHandler,
 		groupWatchedMovieHandler,

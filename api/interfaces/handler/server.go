@@ -5,7 +5,8 @@ type Server struct {
 	*MoviesHandler
 	*MovieDetailHandler
 	*UserMovieStatusHandler
-	*FavoriteMoviesHandler
+	*MyFavoriteMoviesHandler
+	*UserFavoriteMoviesHandler
 	*GroupHandler
 	*GroupWatchedMovieHandler
 }
@@ -15,7 +16,8 @@ func NewServer(
 	movieH *MoviesHandler,
 	movieDetailH *MovieDetailHandler,
 	userMovieStatusH *UserMovieStatusHandler,
-	favoriteMoviesH *FavoriteMoviesHandler,
+	myFavoriteMoviesH *MyFavoriteMoviesHandler,
+	userFavoriteMoviesH *UserFavoriteMoviesHandler,
 	groupH *GroupHandler,
 	groupWatchedMovieH *GroupWatchedMovieHandler,
 ) *Server {
@@ -24,7 +26,8 @@ func NewServer(
 		MoviesHandler:            movieH,
 		MovieDetailHandler:       movieDetailH,
 		UserMovieStatusHandler:   userMovieStatusH,
-		FavoriteMoviesHandler:    favoriteMoviesH,
+		MyFavoriteMoviesHandler:  myFavoriteMoviesH,
+		UserFavoriteMoviesHandler: userFavoriteMoviesH,
 		GroupHandler:             groupH,
 		GroupWatchedMovieHandler: groupWatchedMovieH,
 	}
