@@ -87,7 +87,7 @@ func main() {
 		groupRepository,
 		groupWatchedMovieRepository,
 	)
-	movieDetailUsecase := movieusecase.NewMovieDetailUsecase(movieDetailRepository)
+	movieDetailUsecase := movieusecase.NewMovieDetailUsecase(movieDetailRepository, groupRepository)
 	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
 	userMovieStatusUsecase := user.NewUserMovieStatusUsecase(userMovieStatusRepository)
 	userFavoriteMoviesUsecase := user.NewFavoriteMoviesUsecase(userFavoriteMovieRepository)
