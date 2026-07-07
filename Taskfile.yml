@@ -9,8 +9,10 @@ tasks:
       - openapi/group-create.yml
       - openapi/user-login-callback.yml
       - openapi/user-logout.yml
+      - openapi/user-favorite-movies.yml
       - openapi/movies.yml
       - openapi/movie-detail.yml
+      - openapi/my-favorite-movies.yml
       - openapi/user-movie-status.yml
       - openapi/group-watched-movies.yml
       - proto/auth.proto

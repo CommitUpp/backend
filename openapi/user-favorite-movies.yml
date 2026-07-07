@@ -1,0 +1,35 @@
+get:
+  summary: 指定ユーザーのお気に入り映画一覧を取得するAPI
+  operationId: getUserFavoriteMovies
+  parameters:
+    - name: user_id
+      in: path
+      description: ユーザーID
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: お気に入り映画一覧取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetFavoriteMoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
