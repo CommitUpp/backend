@@ -28,7 +28,7 @@ func (r *GroupWatchedMovieRepository) GetWatchedMovies(
 			gm.group_id,
 			m.id AS movie_id,
 			m.title,
-			m.poster_url,
+			m.trailer_url,
 			u.id AS user_id,
 			u.avatar_url
 		FROM group_members gm
@@ -62,21 +62,21 @@ func (r *GroupWatchedMovieRepository) GetWatchedMovies(
 	for rows.Next() {
 		var (
 			row        domainrepo.GroupWatchedMovieRow
-			posterPath string
+			trailerPath string
 		)
 
 		if err := rows.Scan(
 			&row.GroupID,
 			&row.MovieID,
 			&row.Title,
-			&posterPath,
+			&trailerPath,
 			&row.UserID,
 			&row.AvatarURL,
 		); err != nil {
 			return nil, err
 		}
 
-		row.PosterURL = tmdb.BuildPosterURL(posterPath)
+		row.TrailerURL = tmdb.BuildBackdropURL(trailerPath)
 
 		watchedMovies = append(watchedMovies, row)
 	}

@@ -30,7 +30,7 @@ func (h *UserFavoriteMoviesHandler) GetUserFavoriteMovies(
 			MovieId:   m.MovieID,
 			TmdbId:    m.TMDBID,
 			Title:     m.Title,
-			PosterUrl: m.PosterURL,
+			TrailerUrl: m.TrailerURL,
 		})
 	}
 

@@ -12,5 +12,6 @@ type Movie struct {
 	MovieID     string
 	TMDBID      string
 	Title       string
-	PosterURL   string
+	Genres      []string
+	TrailerURL  string
 }

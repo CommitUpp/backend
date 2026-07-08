@@ -44,7 +44,8 @@ func (h *MoviesHandler) GetMovies(
 			MovieId:   m.MovieID,
 			TmdbId:    m.TMDBID,
 			Title:     m.Title,
-			PosterUrl: m.PosterURL,
+			Genres:    m.Genres,
+			TrailerUrl: m.TrailerURL,
 		})
 	}
 

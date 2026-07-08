@@ -7,10 +7,10 @@ type GroupWatchedMovieRepository interface {
 }
 
 type GroupWatchedMovieRow struct {
-	GroupID   string
-	MovieID   string
-	Title     string
-	PosterURL string
-	UserID    string
-	AvatarURL string
+	GroupID			string
+	MovieID			string
+	Title     	string
+	TrailerURL 	string
+	UserID    	string
+	AvatarURL 	string
 }

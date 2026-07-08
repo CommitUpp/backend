@@ -104,7 +104,8 @@ components:
         - movie_id
         - tmdb_id
         - title
-        - poster_url
+        - genres
+        - trailer_url
       properties:
         movie_id:
           type: string
@@ -112,7 +113,11 @@ components:
           type: string
         title:
           type: string
-        poster_url:
+        genres:
+          type: array
+          items:
+            type: string
+        trailer_url:
           type: string
 
     MovieDetail:
@@ -121,6 +126,7 @@ components:
         - movie_id
         - tmdb_id
         - title
+        - genres
         - poster_url
         - trailer_url
         - overview
@@ -134,6 +140,10 @@ components:
           type: string
         title:
           type: string
+        genres:
+          type: array
+          items:
+            type: string
         poster_url:
           type: string
         trailer_url:
@@ -263,14 +273,14 @@ components:
       required:
         - movie_id
         - title
-        - poster_url
+        - trailer_url
         - watched_member
       properties:
         movie_id:
           type: string
         title:
           type: string
-        poster_url:
+        trailer_url:
           type: string
         watched_member:
           type: array

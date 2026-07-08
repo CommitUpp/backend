@@ -41,7 +41,7 @@ func (h *MyFavoriteMoviesHandler) GetMyFavoriteMovies(c echo.Context) error {
 			MovieId:   m.MovieID,
 			TmdbId:    m.TMDBID,
 			Title:     m.Title,
-			PosterUrl: m.PosterURL,
+			TrailerUrl: m.TrailerURL,
 		})
 	}
 
