@@ -1,5 +1,5 @@
 get:
-  summary: グループのチャットルーム一覧を取得するAPI
+  summary: グループのチャットルーム一覧取得API
   operationId: getGroupChatRooms
   security:
     - SupabaseAuth: []
@@ -11,7 +11,7 @@ get:
         type: string
   responses:
     '200':
-      description: チャットルーム一覧取得成功
+      description: グループのチャットルーム一覧取得成功
       content:
         application/json:
           schema:

@@ -28,7 +28,7 @@ paths:
   /groups/{group_id}/watched-movies:
     $ref: './group-watched-movies.yml'
   /groups/{group_id}/chat-rooms:
-    $ref: './chat-rooms.yml'
+    $ref: './group-chat-rooms.yml'
 
 components:
   securitySchemes:
@@ -325,6 +325,7 @@ components:
       required:
         - id
         - group_id
+        - movie_id
         - movie_title
         - created_by
         - created_at
@@ -338,6 +339,7 @@ components:
         movie_id:
           type: string
           format: uuid
+          nullable: true
         movie_title:
           type: string
         created_by:
