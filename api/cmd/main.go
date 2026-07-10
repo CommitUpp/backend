@@ -77,6 +77,7 @@ func main() {
 	// repository
 	groupRepository := infrastructure.NewGroupRepository(supabaseURL, supabaseAnonKey)
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
+	chatRoomRepository := postgres.NewChatRoomRepository(dbPool)
 	movieRepository := postgres.NewMovieRepository(dbPool)
 	movieDetailRepository := postgres.NewMovieDetailRepository(dbPool)
 	userMovieStatusRepository := postgres.NewUserMovieStatusRepository(supabaseURL, supabaseAnonKey)
@@ -88,6 +89,10 @@ func main() {
 		groupRepository,
 		groupWatchedMovieRepository,
 	)
+	chatRoomUsecase := groupusecase.NewChatRoomUsecase(
+		groupRepository,
+		chatRoomRepository,
+	)
 	movieDetailUsecase := movieusecase.NewMovieDetailUsecase(movieDetailRepository, groupRepository)
 	moviesUsecase := movieusecase.NewMoviesUsecase(movieRepository)
 	userMovieStatusUsecase := user.NewUserMovieStatusUsecase(userMovieStatusRepository)
@@ -97,6 +102,7 @@ func main() {
 	authHandler := handler.NewAuthHandler(authUsecase)
 	groupHandler := handler.NewGroupHandler(groupUsecase)
 	groupWatchedMovieHandler := handler.NewGroupWatchedMovieHandler(groupWatchedMovieUsecase)
+	chatRoomHandler := handler.NewChatRoomHandler(chatRoomUsecase)
 	moviesHandler := handler.NewMoviesHandler(moviesUsecase)
 	movieDetailHandler := handler.NewMovieDetailHandler(movieDetailUsecase)
 	userMovieStatusHandler := handler.NewUserMovieStatusHandler(userMovieStatusUsecase)
@@ -112,6 +118,7 @@ func main() {
 		userFavoriteMoviesHandler,
 		groupHandler,
 		groupWatchedMovieHandler,
+		chatRoomHandler,
 	)
 
 	routerConfig := router.RouterConfig{
