@@ -53,7 +53,7 @@ func (r *movieDetailRepository) GetMovieDetail(
 	movieDetail.PosterURL = tmdb.BuildPosterURL(posterPath)
 	movieDetail.TrailerURL = tmdb.BuildBackdropURL(trailerPath)
 
-	watchedUsers, err := r.getWatchedUsers(ctx, movieID, userID)
+	watchedUsers, err := r.getWatchedUsers(ctx, movieID, groupID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +72,7 @@ func (r *movieDetailRepository) GetMovieDetail(
 func (r *movieDetailRepository) getWatchedUsers(
 	ctx context.Context,
 	movieID string,
+	groupID string,
 	userID string,
 ) ([]repository.WatchedUser, error) {
 	rows, err := r.db.Query(ctx, `
@@ -82,11 +83,14 @@ func (r *movieDetailRepository) getWatchedUsers(
 		FROM watch_statuses ws
 		INNER JOIN users u
 			ON u.id = ws.user_id
+		INNER JOIN group_members gm
+			ON gm.user_id = ws.user_id
+			AND gm.group_id = $2
 		WHERE ws.movie_id = $1
 			AND ws.status = 'watched'
-			AND ws.user_id <> $2
+			AND ws.user_id <> $3
 		ORDER BY u.id
-	`, movieID, userID)
+	`, movieID, groupID, userID)
 	if err != nil {
 		return nil, err
 	}

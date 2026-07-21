@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	ErrUserIDRequired  = errors.New("user ID is required")
-	ErrGroupIDRequired = errors.New("group ID is required")
-	ErrForbidden       = errors.New("forbidden")
+	ErrUserIDRequired      = errors.New("user ID is required")
+	ErrGroupIDRequired     = errors.New("group ID is required")
+	ErrAccessTokenRequired = errors.New("access token is required")
+	ErrForbidden           = errors.New("forbidden")
 )
 
 type MovieDetailUsecase struct {
@@ -33,6 +34,7 @@ func (u *MovieDetailUsecase) GetMovieDetail(
 	movieID string,
 	groupID string,
 	userID string,
+	accessToken string,
 ) (*repository.MovieDetail, error) {
 	if userID == "" {
 		return nil, ErrUserIDRequired
@@ -42,7 +44,11 @@ func (u *MovieDetailUsecase) GetMovieDetail(
 		return nil, ErrGroupIDRequired
 	}
 
-	isMember, err := u.groupRepository.IsGroupMember(ctx, userID, groupID)
+	if accessToken == "" {
+		return nil, ErrAccessTokenRequired
+	}
+
+	isMember, err := u.groupRepository.IsGroupMember(ctx, userID, groupID, accessToken)
 	if err != nil {
 		return nil, err
 	}
