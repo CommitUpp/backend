@@ -19,7 +19,7 @@ func NewFavoriteMovieRepository(db *pgxpool.Pool) repository.FavoriteMovieReposi
 
 func (r *favoriteMovieRepository) GetFavoriteMovies(ctx context.Context, userID string) ([]repository.Movie, error) {
 	query := `
-		SELECT m.id, m.tmdb_id, m.title, m.poster_url
+		SELECT m.id, m.tmdb_id, m.title, m.trailer_url
 		FROM favorite_movies fm
 		JOIN movies m ON fm.movie_id = m.id
 		WHERE fm.user_id = $1
@@ -41,7 +41,7 @@ func (r *favoriteMovieRepository) GetFavoriteMovies(ctx context.Context, userID 
 			return nil, err
 		}
 
-		movie.PosterURL = tmdb.BuildPosterURL(posterPath)
+		movie.TrailerURL = tmdb.BuildBackdropURL(posterPath)
 
 		favoriteMovies = append(favoriteMovies, movie)
 	}

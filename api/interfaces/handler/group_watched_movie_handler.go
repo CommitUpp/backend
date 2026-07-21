@@ -65,7 +65,7 @@ func (h *GroupWatchedMovieHandler) GetGroupWatchedMovies(c echo.Context, groupId
 			movies = append(movies, GetGroupWatchedMoviesMovie{
 				MovieId:       row.MovieID,
 				Title:         row.Title,
-				PosterUrl:     row.PosterURL,
+				TrailerUrl:     row.TrailerURL,
 				WatchedMember: []WatchedMember{},
 			})
 			index = len(movies) - 1
