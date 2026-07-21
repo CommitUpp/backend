@@ -4,8 +4,8 @@ import (
 	"context"
 
 	domainrepo "github.com/CommitUpp/backend/api/domain/repository"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/CommitUpp/backend/api/lib/tmdb"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type GroupWatchedMovieRepository struct {
@@ -58,7 +58,7 @@ func (r *GroupWatchedMovieRepository) GetWatchedMovies(
 	defer rows.Close()
 
 	watchedMovies := make([]domainrepo.GroupWatchedMovieRow, 0)
-	
+
 	for rows.Next() {
 		var (
 			row        domainrepo.GroupWatchedMovieRow

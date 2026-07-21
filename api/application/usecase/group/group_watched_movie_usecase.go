@@ -8,13 +8,14 @@ import (
 )
 
 var (
-	ErrUserIDRequired  = errors.New("user ID is required")
-	ErrGroupIDRequired = errors.New("group ID is required")
-	ErrForbidden       = errors.New("forbidden")
+	ErrUserIDRequired      = errors.New("user ID is required")
+	ErrGroupIDRequired     = errors.New("group ID is required")
+	ErrAccessTokenRequired = errors.New("access token is required")
+	ErrForbidden           = errors.New("forbidden")
 )
 
 type GroupWatchedMovieUsecase interface {
-	GetWatchedMovies(ctx context.Context, userID string, groupID string) ([]repository.GroupWatchedMovieRow, error)
+	GetWatchedMovies(ctx context.Context, userID string, groupID string, accessToken string) ([]repository.GroupWatchedMovieRow, error)
 }
 
 type groupWatchedMovieUsecase struct {
@@ -36,6 +37,7 @@ func (u *groupWatchedMovieUsecase) GetWatchedMovies(
 	ctx context.Context,
 	userID string,
 	groupID string,
+	accessToken string,
 ) ([]repository.GroupWatchedMovieRow, error) {
 	if userID == "" {
 		return nil, ErrUserIDRequired
@@ -45,7 +47,11 @@ func (u *groupWatchedMovieUsecase) GetWatchedMovies(
 		return nil, ErrGroupIDRequired
 	}
 
-	isMember, err := u.groupRepo.IsGroupMember(ctx, userID, groupID)
+	if accessToken == "" {
+		return nil, ErrAccessTokenRequired
+	}
+
+	isMember, err := u.groupRepo.IsGroupMember(ctx, userID, groupID, accessToken)
 	if err != nil {
 		return nil, err
 	}

@@ -22,13 +22,13 @@ func NewServer(
 	groupWatchedMovieH *GroupWatchedMovieHandler,
 ) *Server {
 	return &Server{
-		AuthHandler:              authH,
-		MoviesHandler:            movieH,
-		MovieDetailHandler:       movieDetailH,
-		UserMovieStatusHandler:   userMovieStatusH,
-		MyFavoriteMoviesHandler:  myFavoriteMoviesH,
+		AuthHandler:               authH,
+		MoviesHandler:             movieH,
+		MovieDetailHandler:        movieDetailH,
+		UserMovieStatusHandler:    userMovieStatusH,
+		MyFavoriteMoviesHandler:   myFavoriteMoviesH,
 		UserFavoriteMoviesHandler: userFavoriteMoviesH,
-		GroupHandler:             groupH,
-		GroupWatchedMovieHandler: groupWatchedMovieH,
+		GroupHandler:              groupH,
+		GroupWatchedMovieHandler:  groupWatchedMovieH,
 	}
 }
