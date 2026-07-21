@@ -27,6 +27,8 @@ paths:
     $ref: './user-movie-status.yml'
   /groups/{group_id}/watched-movies:
     $ref: './group-watched-movies.yml'
+  /groups/{group_id}/chat-rooms:
+    $ref: './group-chat-rooms.yml'
 
 components:
   securitySchemes:
@@ -307,6 +309,45 @@ components:
           type: string
         avatar_url:
           type: string
+
+    GetGroupChatRoomsResponse:
+      type: object
+      required:
+        - chat_rooms
+      properties:
+        chat_rooms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatRoom"
+
+    ChatRoom:
+      type: object
+      required:
+        - id
+        - group_id
+        - movie_id
+        - movie_title
+        - created_by
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+        movie_id:
+          type: string
+          format: uuid
+          nullable: true
+        movie_title:
+          type: string
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
 
     BadRequestError:
       type: object

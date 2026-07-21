@@ -16,6 +16,7 @@ tasks:
       - openapi/my-favorite-movies.yml
       - openapi/user-movie-status.yml
       - openapi/group-watched-movies.yml
+      - openapi/group-chat-rooms.yml
       - proto/auth.proto
     generates:
       # OpenAPIの出力先
