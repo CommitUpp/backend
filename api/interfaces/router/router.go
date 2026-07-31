@@ -31,6 +31,7 @@ func NewRouter(cfg RouterConfig) *echo.Echo {
 			"getGroupWatchedMovies": {authMiddleware},
 			"joinGroup":             {authMiddleware},
 			"getGroupChatRooms":     {authMiddleware},
+			"createGroupChatRoom":   {authMiddleware},
 		},
 	})
 

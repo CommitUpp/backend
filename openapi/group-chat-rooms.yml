@@ -1,14 +1,16 @@
+parameters:
+  - name: group_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+
 get:
   summary: グループのチャットルーム一覧取得API
   operationId: getGroupChatRooms
   security:
     - SupabaseAuth: []
-  parameters:
-    - name: group_id
-      in: path
-      required: true
-      schema:
-        type: string
   responses:
     '200':
       description: グループのチャットルーム一覧取得成功
@@ -34,6 +36,61 @@ get:
         application/json:
           schema:
             $ref: '#/components/schemas/ForbiddenError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+
+post:
+  summary: グループのチャットルーム作成API
+  operationId: createGroupChatRoom
+  security:
+    - SupabaseAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/CreateChatRoomRequest'
+  responses:
+    '201':
+      description: チャットルーム作成成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateChatRoomResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '403':
+      description: グループ未所属、または映画が未視聴
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    '404':
+      description: 映画が存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '409':
+      description: 同じ映画のチャットルームが既に存在する
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
     '500':
       description: サーバー内部エラー
       content:

@@ -53,6 +53,7 @@ func (r *GroupRepository) IsGroupMember(ctx context.Context, userID string, grou
 	values.Set("select", "group_id")
 	values.Set("group_id", "eq."+groupID)
 	values.Set("user_id", "eq."+userID)
+	values.Set("is_active", "eq.true")
 	values.Set("limit", "1")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/group_members?"+values.Encode(), nil)
