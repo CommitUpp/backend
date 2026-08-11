@@ -40,19 +40,22 @@ func (r *GroupRepository) CreateGroupWithOwner(ctx context.Context, input reposi
 	return r.callGroupRPC(ctx, "create_group", body, input.AccessToken)
 }
 
-func (r *GroupRepository) ListGroupsByUser(ctx context.Context, userID string, accessToken string) ([]repository.CreatedGroup, error) {
-	values := url.Values{}
-	values.Set("select", "groups(id,name)")
-	values.Set("user_id", "eq."+userID)
-	values.Set("is_active", "eq.true")
-	values.Set("order", "joined_at.desc")
+func (r *GroupRepository) ListGroupsByUser(ctx context.Context, userID string, accessToken string) ([]repository.GroupSummary, error) {
+	body := map[string]string{
+		"target_user_id": userID,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/group_members?"+values.Encode(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.baseURL+"/rpc/get_groups_by_user", bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
 
 	r.setAuthHeaders(req, accessToken)
+	req.Header.Set("Content-Type", "application/json")
 
 	res, err := r.client.Do(req)
 	if err != nil {
@@ -69,18 +72,18 @@ func (r *GroupRepository) ListGroupsByUser(ctx context.Context, userID string, a
 		return nil, groupRPCError(resBody)
 	}
 
-	var rows []groupMemberGroupRow
+	var rows []groupSummaryRPCRow
 	if err := json.Unmarshal(resBody, &rows); err != nil {
 		return nil, err
 	}
 
-	groups := make([]repository.CreatedGroup, 0, len(rows))
+	groups := make([]repository.GroupSummary, 0, len(rows))
 	for _, row := range rows {
-		group, err := row.Groups.createdGroup()
-		if err != nil {
-			return nil, err
-		}
-		groups = append(groups, group)
+		groups = append(groups, repository.GroupSummary{
+			ID:          row.ID,
+			Name:        row.Name,
+			MemberCount: row.MemberCount,
+		})
 	}
 
 	return groups, nil
@@ -219,8 +222,10 @@ type groupRPCRow struct {
 	CreatedAtSnake   time.Time `json:"created_at"`
 }
 
-type groupMemberGroupRow struct {
-	Groups groupRPCRow `json:"groups"`
+type groupSummaryRPCRow struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	MemberCount int    `json:"member_count"`
 }
 
 func (r groupRPCRow) createdGroup() (repository.CreatedGroup, error) {

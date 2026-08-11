@@ -63,8 +63,9 @@ func (h *GroupHandler) GetMyGroups(c echo.Context) error {
 	groups := make([]MyGroup, 0, len(output.Groups))
 	for _, group := range output.Groups {
 		groups = append(groups, MyGroup{
-			Id:   group.ID,
-			Name: group.Name,
+			Id:          group.ID,
+			MemberCount: int32(group.MemberCount),
+			Name:        group.Name,
 		})
 	}
 

@@ -99,11 +99,16 @@ components:
       required:
         - id
         - name
+        - memberCount
       properties:
         id:
           type: string
         name:
           type: string
+        memberCount:
+          type: integer
+          format: int32
+          minimum: 0
 
     LoginCallbackResponse:
       type: object

@@ -51,8 +51,9 @@ type GetMyGroupsOutput struct {
 }
 
 type GroupOutput struct {
-	ID   string
-	Name string
+	ID          string
+	Name        string
+	MemberCount int
 }
 
 type JoinGroupInput struct {
@@ -143,8 +144,9 @@ func (u *groupUsecaseImpl) GetMyGroups(ctx context.Context, input GetMyGroupsInp
 	outputGroups := make([]GroupOutput, 0, len(groups))
 	for _, group := range groups {
 		outputGroups = append(outputGroups, GroupOutput{
-			ID:   group.ID,
-			Name: group.Name,
+			ID:          group.ID,
+			Name:        group.Name,
+			MemberCount: group.MemberCount,
 		})
 	}
 
