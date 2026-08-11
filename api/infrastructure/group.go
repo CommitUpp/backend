@@ -40,6 +40,52 @@ func (r *GroupRepository) CreateGroupWithOwner(ctx context.Context, input reposi
 	return r.callGroupRPC(ctx, "create_group", body, input.AccessToken)
 }
 
+func (r *GroupRepository) ListGroupsByUser(ctx context.Context, userID string, accessToken string) ([]repository.CreatedGroup, error) {
+	values := url.Values{}
+	values.Set("select", "groups(id,name)")
+	values.Set("user_id", "eq."+userID)
+	values.Set("is_active", "eq.true")
+	values.Set("order", "joined_at.desc")
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/group_members?"+values.Encode(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r.setAuthHeaders(req, accessToken)
+
+	res, err := r.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode >= http.StatusBadRequest {
+		return nil, groupRPCError(resBody)
+	}
+
+	var rows []groupMemberGroupRow
+	if err := json.Unmarshal(resBody, &rows); err != nil {
+		return nil, err
+	}
+
+	groups := make([]repository.CreatedGroup, 0, len(rows))
+	for _, row := range rows {
+		group, err := row.Groups.createdGroup()
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, group)
+	}
+
+	return groups, nil
+}
+
 func (r *GroupRepository) JoinGroup(ctx context.Context, input repository.JoinGroupInput) (repository.CreatedGroup, error) {
 	body := map[string]interface{}{
 		"group_id": input.GroupID,
@@ -171,6 +217,10 @@ type groupRPCRow struct {
 	MonthlyGoalSnake int       `json:"monthly_goal"`
 	CreatedAt        time.Time `json:"createdAt"`
 	CreatedAtSnake   time.Time `json:"created_at"`
+}
+
+type groupMemberGroupRow struct {
+	Groups groupRPCRow `json:"groups"`
 }
 
 func (r groupRPCRow) createdGroup() (repository.CreatedGroup, error) {

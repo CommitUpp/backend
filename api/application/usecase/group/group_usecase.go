@@ -41,6 +41,20 @@ type CreateGroupOutput struct {
 	CreatedAt   time.Time
 }
 
+type GetMyGroupsInput struct {
+	UserID      string
+	AccessToken string
+}
+
+type GetMyGroupsOutput struct {
+	Groups []GroupOutput
+}
+
+type GroupOutput struct {
+	ID   string
+	Name string
+}
+
 type JoinGroupInput struct {
 	GroupID     string
 	UserID      string
@@ -57,6 +71,7 @@ type JoinGroupOutput struct {
 // グループ関連のアプリケーションロジックを定義
 type GroupUsecase interface {
 	CreateGroup(ctx context.Context, input CreateGroupInput) (CreateGroupOutput, error)
+	GetMyGroups(ctx context.Context, input GetMyGroupsInput) (GetMyGroupsOutput, error)
 	JoinGroup(ctx context.Context, input JoinGroupInput) (JoinGroupOutput, error)
 }
 
@@ -105,6 +120,35 @@ func (u *groupUsecaseImpl) CreateGroup(ctx context.Context, input CreateGroupInp
 		MonthlyGoal: createdGroup.MonthlyGoal,
 		CreatedAt:   createdGroup.CreatedAt,
 	}, nil
+}
+
+func (u *groupUsecaseImpl) GetMyGroups(ctx context.Context, input GetMyGroupsInput) (GetMyGroupsOutput, error) {
+	if input.UserID == "" {
+		return GetMyGroupsOutput{}, ErrInvalidUserID
+	}
+
+	if input.AccessToken == "" {
+		return GetMyGroupsOutput{}, ErrInvalidAccessToken
+	}
+
+	if u.groupRepository == nil {
+		return GetMyGroupsOutput{}, ErrGroupRepositoryNotConfigured
+	}
+
+	groups, err := u.groupRepository.ListGroupsByUser(ctx, input.UserID, input.AccessToken)
+	if err != nil {
+		return GetMyGroupsOutput{}, err
+	}
+
+	outputGroups := make([]GroupOutput, 0, len(groups))
+	for _, group := range groups {
+		outputGroups = append(outputGroups, GroupOutput{
+			ID:   group.ID,
+			Name: group.Name,
+		})
+	}
+
+	return GetMyGroupsOutput{Groups: outputGroups}, nil
 }
 
 func (u *groupUsecaseImpl) JoinGroup(ctx context.Context, input JoinGroupInput) (JoinGroupOutput, error) {

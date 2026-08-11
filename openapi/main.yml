@@ -64,7 +64,7 @@ components:
         groups:
           type: array
           items:
-            $ref: '#/components/schemas/Group'
+            $ref: '#/components/schemas/MyGroup'
 
     JoinGroupResponse:
       type: object
@@ -93,6 +93,17 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    MyGroup:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
 
     LoginCallbackResponse:
       type: object
