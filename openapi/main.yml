@@ -8,7 +8,7 @@ servers:
 
 paths:
   /groups:
-    $ref: './group-create.yml'
+    $ref: './groups.yml'
   /groups/{group_id}/join:
     $ref: './group-join.yml'
   /user/callback:
@@ -55,6 +55,16 @@ components:
       properties:
         group:
           $ref: "#/components/schemas/Group"
+
+    GetMyGroupsResponse:
+      type: object
+      required:
+        - groups
+      properties:
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
 
     JoinGroupResponse:
       type: object
