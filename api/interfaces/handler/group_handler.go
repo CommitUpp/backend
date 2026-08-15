@@ -21,6 +21,59 @@ func NewGroupHandler(gu groupusecase.GroupUsecase) *GroupHandler {
 	}
 }
 
+func (h *GroupHandler) GetMyGroups(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	userID, ok := c.Get("user_id").(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: "invalid user",
+		})
+	}
+
+	accessToken, ok := c.Get("access_token").(string)
+	if !ok || accessToken == "" {
+		return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+			Message: "invalid token",
+		})
+	}
+
+	output, err := h.groupUsecase.GetMyGroups(ctx, groupusecase.GetMyGroupsInput{
+		UserID:      userID,
+		AccessToken: accessToken,
+	})
+	if err != nil {
+		if errors.Is(err, groupusecase.ErrInvalidUserID) || errors.Is(err, groupusecase.ErrInvalidAccessToken) {
+			return c.JSON(http.StatusUnauthorized, UnauthorizedError{
+				Message: "invalid user",
+			})
+		}
+
+		if errors.Is(err, groupusecase.ErrGroupRepositoryNotConfigured) {
+			return c.JSON(http.StatusInternalServerError, InternalServerError{
+				Message: "group repository is not configured",
+			})
+		}
+
+		return c.JSON(http.StatusInternalServerError, InternalServerError{
+			Message: err.Error(),
+		})
+	}
+
+	groups := make([]MyGroup, 0, len(output.Groups))
+	for _, group := range output.Groups {
+		groups = append(groups, MyGroup{
+			Id:          group.ID,
+			MemberCount: int32(group.MemberCount),
+			Name:        group.Name,
+		})
+	}
+
+	return c.JSON(http.StatusOK, GetMyGroupsResponse{
+		Groups: groups,
+	})
+}
+
 // グループ作成リクエストを受け取り、呼び出し元を検証
 func (h *GroupHandler) CreateGroup(c echo.Context) error {
 	ctx := c.Request().Context()

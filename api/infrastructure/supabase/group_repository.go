@@ -40,6 +40,55 @@ func (r *GroupRepository) CreateGroupWithOwner(ctx context.Context, input reposi
 	return r.callGroupRPC(ctx, "create_group", body, input.AccessToken)
 }
 
+func (r *GroupRepository) ListGroupsByUser(ctx context.Context, userID string, accessToken string) ([]repository.GroupSummary, error) {
+	body := map[string]string{
+		"target_user_id": userID,
+	}
+	reqBody, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.baseURL+"/rpc/get_groups_by_user", bytes.NewReader(reqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	r.setAuthHeaders(req, accessToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := r.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode >= http.StatusBadRequest {
+		return nil, groupRPCError(resBody)
+	}
+
+	var rows []groupSummaryRPCRow
+	if err := json.Unmarshal(resBody, &rows); err != nil {
+		return nil, err
+	}
+
+	groups := make([]repository.GroupSummary, 0, len(rows))
+	for _, row := range rows {
+		groups = append(groups, repository.GroupSummary{
+			ID:          row.ID,
+			Name:        row.Name,
+			MemberCount: row.MemberCount,
+		})
+	}
+
+	return groups, nil
+}
+
 func (r *GroupRepository) JoinGroup(ctx context.Context, input repository.JoinGroupInput) (repository.CreatedGroup, error) {
 	body := map[string]interface{}{
 		"group_id": input.GroupID,
@@ -171,6 +220,12 @@ type groupRPCRow struct {
 	MonthlyGoalSnake int       `json:"monthly_goal"`
 	CreatedAt        time.Time `json:"createdAt"`
 	CreatedAtSnake   time.Time `json:"created_at"`
+}
+
+type groupSummaryRPCRow struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	MemberCount int    `json:"member_count"`
 }
 
 func (r groupRPCRow) createdGroup() (repository.CreatedGroup, error) {
