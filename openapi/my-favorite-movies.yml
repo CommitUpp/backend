@@ -1,0 +1,68 @@
+get:
+  summary: ログインユーザーのお気に入り映画一覧を取得するAPI
+  operationId: getMyFavoriteMovies
+  security:
+    - SupabaseAuth: []
+  parameters:
+  responses:
+    '200':
+      description: お気に入り映画一覧取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetFavoriteMoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+
+put:
+  summary: ログインユーザーのお気に入り映画を追加するAPI
+  operationId: putMyFavoriteMovies
+  security:
+    - SupabaseAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/FavoriteMoviesRequest'
+  responses:
+    '200':
+      description: お気に入り映画追加成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FavoriteMoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'

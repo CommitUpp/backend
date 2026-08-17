@@ -1,21 +1,20 @@
-post:
-  summary: 映画の視聴ステータスを更新するAPI
-  operationId: updateMovieStatus
-  security:
-    - SupabaseAuth: []
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '#/components/schemas/UpdateMovieStatusRequest'
+get:
+  summary: 指定ユーザーのお気に入り映画一覧を取得するAPI
+  operationId: getUserFavoriteMovies
+  parameters:
+    - name: user_id
+      in: path
+      description: ユーザーID
+      required: true
+      schema:
+        type: string
   responses:
     '200':
-      description: ステータス更新成功
+      description: お気に入り映画一覧取得成功
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UpdateMovieStatusResponse'
+            $ref: '#/components/schemas/GetFavoriteMoviesResponse'
     '400':
       description: バリデーションエラー
       content:

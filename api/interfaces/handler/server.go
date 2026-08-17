@@ -2,12 +2,36 @@ package handler
 
 type Server struct {
 	*AuthHandler
-	*MovieStatusHandler
+	*MoviesHandler
+	*MovieDetailHandler
+	*UserMovieStatusHandler
+	*MyFavoriteMoviesHandler
+	*UserFavoriteMoviesHandler
+	*GroupHandler
+	*GroupWatchedMovieHandler
+	*ChatRoomHandler
 }
 
-func NewServer(authH *AuthHandler, movieH *MovieStatusHandler) *Server {
+func NewServer(
+	authH *AuthHandler,
+	movieH *MoviesHandler,
+	movieDetailH *MovieDetailHandler,
+	userMovieStatusH *UserMovieStatusHandler,
+	myFavoriteMoviesH *MyFavoriteMoviesHandler,
+	userFavoriteMoviesH *UserFavoriteMoviesHandler,
+	groupH *GroupHandler,
+	groupWatchedMovieH *GroupWatchedMovieHandler,
+	chatRoomH *ChatRoomHandler,
+) *Server {
 	return &Server{
-		AuthHandler:        authH,
-		MovieStatusHandler: movieH,
+		AuthHandler:               authH,
+		MoviesHandler:             movieH,
+		MovieDetailHandler:        movieDetailH,
+		UserMovieStatusHandler:    userMovieStatusH,
+		MyFavoriteMoviesHandler:   myFavoriteMoviesH,
+		UserFavoriteMoviesHandler: userFavoriteMoviesH,
+		GroupHandler:              groupH,
+		GroupWatchedMovieHandler:  groupWatchedMovieH,
+		ChatRoomHandler:           chatRoomH,
 	}
 }

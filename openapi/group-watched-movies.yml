@@ -1,0 +1,42 @@
+get:
+  summary: グループ内の視聴状況を取得するAPI
+  operationId: getGroupWatchedMovies
+  security:
+    - SupabaseAuth: []
+  parameters:
+    - name: group_id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: グループ内の視聴状況取得成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetGroupWatchedMoviesResponse'
+    '403':
+      description: 権限エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
