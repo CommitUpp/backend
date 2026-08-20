@@ -10,9 +10,9 @@ import (
 	groupusecase "github.com/CommitUpp/backend/api/application/usecase/group"
 	movieusecase "github.com/CommitUpp/backend/api/application/usecase/movie"
 	"github.com/CommitUpp/backend/api/application/usecase/user"
-	"github.com/CommitUpp/backend/api/infrastructure"
 	"github.com/CommitUpp/backend/api/infrastructure/grpc"
 	"github.com/CommitUpp/backend/api/infrastructure/postgres"
+	"github.com/CommitUpp/backend/api/infrastructure/supabase"
 	"github.com/CommitUpp/backend/api/interfaces/grpc/pb"
 	"github.com/CommitUpp/backend/api/interfaces/handler"
 	"github.com/CommitUpp/backend/api/interfaces/router"
@@ -75,7 +75,7 @@ func main() {
 	}
 
 	// repository
-	groupRepository := infrastructure.NewGroupRepository(supabaseURL, supabaseAnonKey)
+	groupRepository := supabase.NewGroupRepository(supabaseURL, supabaseAnonKey)
 	groupWatchedMovieRepository := postgres.NewGroupWatchedMovieRepository(dbPool)
 	chatRoomRepository := postgres.NewChatRoomRepository(dbPool)
 	chatMessageRepository := postgres.NewChatMessageRepository(dbPool)
