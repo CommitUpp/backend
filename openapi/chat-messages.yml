@@ -1,0 +1,56 @@
+parameters:
+  - name: room_id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+
+post:
+  summary: チャットメッセージ送信API
+  operationId: createChatMessage
+  security:
+    - SupabaseAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/CreateChatMessageRequest'
+  responses:
+    '201':
+      description: メッセージ送信成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateChatMessageResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '403':
+      description: チャットルームが属するグループのメンバーではない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+    '404':
+      description: チャットルームが存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
