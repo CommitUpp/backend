@@ -10,6 +10,7 @@ type Server struct {
 	*GroupHandler
 	*GroupWatchedMovieHandler
 	*ChatRoomHandler
+	*ChatMessageHandler
 }
 
 func NewServer(
@@ -22,6 +23,7 @@ func NewServer(
 	groupH *GroupHandler,
 	groupWatchedMovieH *GroupWatchedMovieHandler,
 	chatRoomH *ChatRoomHandler,
+	chatMessageH *ChatMessageHandler,
 ) *Server {
 	return &Server{
 		AuthHandler:               authH,
@@ -33,5 +35,6 @@ func NewServer(
 		GroupHandler:              groupH,
 		GroupWatchedMovieHandler:  groupWatchedMovieH,
 		ChatRoomHandler:           chatRoomH,
+		ChatMessageHandler:        chatMessageH,
 	}
 }
