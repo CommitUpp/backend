@@ -11,6 +11,7 @@ func CORSMiddleware() echo.MiddlewareFunc {
 	return middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{
 			"http://localhost:3000",
+			"https://sheater.rk3s.com",
 		},
 		AllowMethods: []string{
 			http.MethodGet,
