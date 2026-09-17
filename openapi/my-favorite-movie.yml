@@ -1,0 +1,88 @@
+parameters:
+  - name: movie_id
+    in: path
+    description: 映画ID
+    required: true
+    schema:
+      type: string
+      format: uuid
+
+post:
+  summary: ログインユーザーのお気に入り映画を1件追加するAPI
+  operationId: addMyFavoriteMovie
+  security:
+    - SupabaseAuth: []
+  responses:
+    '201':
+      description: お気に入り映画追加成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FavoriteMoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '404':
+      description: 映画が存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '409':
+      description: 既にお気に入り登録済み、または上限に達している
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+
+delete:
+  summary: ログインユーザーのお気に入り映画を1件解除するAPI
+  operationId: deleteMyFavoriteMovie
+  security:
+    - SupabaseAuth: []
+  responses:
+    '200':
+      description: お気に入り映画解除成功
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FavoriteMoviesResponse'
+    '400':
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    '401':
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+    '404':
+      description: お気に入り登録が存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '500':
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'

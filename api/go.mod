@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/labstack/echo/v4 v4.15.2
-	github.com/oapi-codegen/runtime v1.4.1
+	github.com/oapi-codegen/runtime v1.7.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/supabase-community/postgrest-go v0.0.12
 	google.golang.org/grpc v1.81.1

@@ -31,7 +31,7 @@ get:
             $ref: '#/components/schemas/InternalServerError'
 
 put:
-  summary: ログインユーザーのお気に入り映画を追加するAPI
+  summary: ログインユーザーのお気に入り映画を一括更新するAPI
   operationId: putMyFavoriteMovies
   security:
     - SupabaseAuth: []
@@ -43,7 +43,7 @@ put:
           $ref: '#/components/schemas/FavoriteMoviesRequest'
   responses:
     '200':
-      description: お気に入り映画追加成功
+      description: お気に入り映画一括更新成功
       content:
         application/json:
           schema:
@@ -60,6 +60,12 @@ put:
         application/json:
           schema:
             $ref: '#/components/schemas/UnauthorizedError'
+    '409':
+      description: お気に入り映画の上限に達している
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
     '500':
       description: サーバー内部エラー
       content:
