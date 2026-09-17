@@ -17,6 +17,8 @@ paths:
     $ref: './user-logout.yml'
   /user/favorite-movies:
     $ref: './my-favorite-movies.yml'
+  /user/favorite-movies/{movie_id}:
+    $ref: './my-favorite-movie.yml'
   /user/{user_id}/favorite-movies:
     $ref: './user-favorite-movies.yml'
   /movies:

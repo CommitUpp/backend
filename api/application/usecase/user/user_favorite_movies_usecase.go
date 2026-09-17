@@ -1,15 +1,26 @@
 package user
 
 import (
-    "log"
-    
 	"context"
+	"errors"
+	"log"
+
 	"github.com/CommitUpp/backend/api/domain/repository"
+)
+
+var (
+	ErrFavoriteMovieAlreadyExists = repository.ErrFavoriteMovieAlreadyExists
+	ErrFavoriteMovieLimitExceeded = repository.ErrFavoriteMovieLimitExceeded
+	ErrFavoriteMovieNotFound      = repository.ErrFavoriteMovieNotFound
+	ErrMovieNotFound              = repository.ErrMovieNotFound
+	ErrMovieIDRequired            = errors.New("movie ID is required")
 )
 
 type FavoriteMovieUsecase interface {
 	GetFavoriteMovies(ctx context.Context, userID string) ([]repository.Movie, error)
 	UpdateFavoriteMovies(ctx context.Context, userID string, movieIDs []string) error
+	AddFavoriteMovie(ctx context.Context, userID string, movieID string) error
+	DeleteFavoriteMovie(ctx context.Context, userID string, movieID string) error
 }
 
 type FavoriteMoviesUsecase struct {
@@ -34,6 +45,9 @@ func (u *FavoriteMoviesUsecase) UpdateFavoriteMovies(
 	userID string,
 	movieIDs []string,
 ) error {
+	if len(movieIDs) > 3 {
+		return ErrFavoriteMovieLimitExceeded
+	}
 
 	log.Printf("=== UpdateFavoriteMovies Start ===")
 	log.Printf("UserID: %s", userID)
@@ -98,4 +112,28 @@ func (u *FavoriteMoviesUsecase) UpdateFavoriteMovies(
 	log.Printf("=== UpdateFavoriteMovies End ===")
 
 	return nil
+}
+
+func (u *FavoriteMoviesUsecase) AddFavoriteMovie(
+	ctx context.Context,
+	userID string,
+	movieID string,
+) error {
+	if movieID == "" {
+		return ErrMovieIDRequired
+	}
+
+	return u.favoriteMovieRepo.AddFavoriteMovie(ctx, userID, movieID)
+}
+
+func (u *FavoriteMoviesUsecase) DeleteFavoriteMovie(
+	ctx context.Context,
+	userID string,
+	movieID string,
+) error {
+	if movieID == "" {
+		return ErrMovieIDRequired
+	}
+
+	return u.favoriteMovieRepo.DeleteFavoriteMovie(ctx, userID, movieID)
 }

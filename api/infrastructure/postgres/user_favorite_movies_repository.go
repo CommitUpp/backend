@@ -2,8 +2,12 @@ package postgres
 
 import (
 	"context"
+	"errors"
+
 	"github.com/CommitUpp/backend/api/domain/repository"
 	"github.com/CommitUpp/backend/api/lib/tmdb"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -65,6 +69,10 @@ func (r *favoriteMovieRepository) UpdateFavorites(
 	}
 	defer tx.Rollback(ctx)
 
+	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtext($1))`, userID); err != nil {
+		return err
+	}
+
 	// 削除
 	for _, movieID := range deleteMovieIDs {
 		_, err := tx.Exec(
@@ -96,6 +104,101 @@ func (r *favoriteMovieRepository) UpdateFavorites(
 
 	if err := tx.Commit(ctx); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (r *favoriteMovieRepository) AddFavoriteMovie(ctx context.Context, userID string, movieID string) error {
+	tx, err := r.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtext($1))`, userID); err != nil {
+		return err
+	}
+
+	var movieExists bool
+	if err := tx.QueryRow(
+		ctx,
+		`SELECT EXISTS (SELECT 1 FROM movies WHERE id = $1)`,
+		movieID,
+	).Scan(&movieExists); err != nil {
+		return err
+	}
+	if !movieExists {
+		return repository.ErrMovieNotFound
+	}
+
+	var favoriteExists bool
+	if err := tx.QueryRow(
+		ctx,
+		`SELECT EXISTS (
+			SELECT 1 FROM favorite_movies
+			WHERE user_id = $1 AND movie_id = $2
+		)`,
+		userID,
+		movieID,
+	).Scan(&favoriteExists); err != nil {
+		return err
+	}
+	if favoriteExists {
+		return repository.ErrFavoriteMovieAlreadyExists
+	}
+
+	var favoriteCount int
+	if err := tx.QueryRow(
+		ctx,
+		`SELECT COUNT(*) FROM favorite_movies WHERE user_id = $1`,
+		userID,
+	).Scan(&favoriteCount); err != nil {
+		return err
+	}
+	if favoriteCount >= 3 {
+		return repository.ErrFavoriteMovieLimitExceeded
+	}
+
+	_, err = tx.Exec(
+		ctx,
+		`INSERT INTO favorite_movies(user_id, movie_id) VALUES($1, $2)`,
+		userID,
+		movieID,
+	)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			switch pgErr.Code {
+			case "23505":
+				return repository.ErrFavoriteMovieAlreadyExists
+			case "23503":
+				return repository.ErrMovieNotFound
+			}
+		}
+		return err
+	}
+
+	return tx.Commit(ctx)
+}
+
+func (r *favoriteMovieRepository) DeleteFavoriteMovie(ctx context.Context, userID string, movieID string) error {
+	tag, err := r.db.Exec(
+		ctx,
+		`DELETE FROM favorite_movies
+		 WHERE user_id = $1
+		   AND movie_id = $2`,
+		userID,
+		movieID,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return repository.ErrFavoriteMovieNotFound
+		}
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return repository.ErrFavoriteMovieNotFound
 	}
 
 	return nil
